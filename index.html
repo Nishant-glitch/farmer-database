@@ -1,664 +1,711 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌾 Farmer Database</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌾 Farmer Database</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+.hide{display:none!important}
+body{background:linear-gradient(135deg,#0a3d1f,#14694a,#1e8a5a);min-height:100vh}
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+/* LOGIN */
+#LOGIN{display:flex;justify-content:center;align-items:center;min-height:100vh;padding:15px}
+#HOME{padding:10px}
+.lbox{width:100%;max-width:430px}
+.logo{text-align:center;margin-bottom:20px}
+.logo span{font-size:3rem;display:block;animation:b 2s infinite}
+@keyframes b{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.logo h1{color:#fff;font-size:1.5rem;margin-top:5px}
+.logo small{color:#a8e6cf;font-size:.8rem}
+.crd{background:#fff;border-radius:18px;box-shadow:0 15px 50px rgba(0,0,0,.3);overflow:hidden}
+.ch{background:linear-gradient(135deg,#1a5c34,#2d8b5e);padding:15px 20px;text-align:center;color:#fff}
+.ch h2{font-size:1.1rem}.ch small{color:#a8e6cf;font-size:.72rem}
+.cn{text-align:center;padding:7px;font-size:.72rem;font-weight:700}
+.cn-g{background:#e8f5e9;color:#2e7d32}
+.cn-r{background:#ffebee;color:#c62828}
+.cn-y{background:#fff3e0;color:#e65100}
+.tbs{display:flex;background:#f0f0f0}
+.tb{flex:1;padding:11px;text-align:center;cursor:pointer;font-weight:600;font-size:.84rem;color:#888;border-bottom:3px solid transparent;transition:.3s}
+.tb.on{color:#4CAF50;border-bottom-color:#4CAF50;background:#fff}
+.fa{padding:20px}
+.fs{display:none}.fs.on{display:block}
+.ig{margin-bottom:14px}
+.ig label{display:block;font-size:.78rem;color:#555;margin-bottom:4px;font-weight:600}
+.ig .r{color:red}
+.iw{position:relative}
+.iw .ic{position:absolute;left:11px;top:50%;transform:translateY(-50%)}
+.iw input{width:100%;padding:10px 12px 10px 36px;border:2px solid #ddd;border-radius:10px;font-size:.88rem;outline:none;transition:.3s}
+.iw input:focus{border-color:#4CAF50;box-shadow:0 0 0 3px rgba(76,175,80,.1)}
+.iw .ey{position:absolute;right:11px;top:50%;transform:translateY(-50%);cursor:pointer;user-select:none}
+.ig .hn{font-size:.66rem;color:#999;margin-top:3px}
+.rm{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;font-size:.76rem}
+.rm label{display:flex;align-items:center;gap:4px;cursor:pointer;color:#666}
+.rm a{color:#4CAF50;text-decoration:none;font-weight:600}
+.bf{width:100%;padding:11px;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer;margin-bottom:8px;transition:.3s;display:flex;align-items:center;justify-content:center;gap:5px}
+.bf:hover{transform:translateY(-1px)}
+.bg{background:linear-gradient(135deg,#4CAF50,#388E3C);color:#fff;box-shadow:0 3px 10px rgba(76,175,80,.4)}
+.bu{background:linear-gradient(135deg,#2196F3,#1565C0);color:#fff}
+.bl{opacity:.6;pointer-events:none}
+.dv{text-align:center;margin:10px 0;color:#aaa;font-size:.78rem;position:relative}
+.dv::before,.dv::after{content:'';position:absolute;top:50%;width:38%;height:1px;background:#ddd}
+.dv::before{left:0}.dv::after{right:0}
+.al{padding:9px 12px;border-radius:8px;margin-bottom:11px;font-size:.78rem;font-weight:600;display:none}
+.al.sh{display:block}
+.al-e{background:#ffebee;color:#c62828;border:1px solid #ffcdd2}
+.al-s{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+.cf{text-align:center;padding:9px;background:#f8f9fa;font-size:.7rem;color:#888}
+.sp{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top:2px solid #fff;border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif}
-        body{background:linear-gradient(135deg,#0a3d1f,#14694a,#1e8a5a);min-height:100vh}
+/* HOME */
+.tp{background:rgba(255,255,255,.12);backdrop-filter:blur(10px);border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.tp h2{color:#fff;font-size:1.1rem}.tp small{color:#a8e6cf;font-size:.68rem;display:block}
+.tp-r{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.uc{background:rgba(255,255,255,.15);padding:5px 12px;border-radius:20px;color:#fff;font-size:.75rem}
+.uc b{color:#a8e6cf}
+.sb{padding:3px 10px;border-radius:14px;font-size:.64rem;font-weight:700}
+.sb-g{background:#4CAF50;color:#fff}.sb-y{background:#FF9800;color:#fff}
+.bo{padding:5px 12px;border:1.5px solid rgba(255,255,255,.3);background:transparent;color:#fff;border-radius:20px;cursor:pointer;font-weight:600;font-size:.74rem}
+.bo:hover{background:rgba(255,255,255,.15)}
+.sr{display:flex;gap:7px;margin-bottom:8px;flex-wrap:wrap}
+.sc{flex:1;min-width:100px;background:rgba(255,255,255,.95);border-radius:10px;padding:11px;text-align:center}
+.sc .nm{font-size:1.3rem;font-weight:bold;color:#0a3d1f}.sc .lb{color:#666;font-size:.64rem;margin-top:2px}
+.sc.c1{border-top:3px solid #2196F3}.sc.c2{border-top:3px solid #4CAF50}.sc.c3{border-top:3px solid #f44336}.sc.c4{border-top:3px solid #FF9800}
+.ct{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+.sg{display:flex;gap:5px;flex-wrap:wrap}
+.sg input,.sg select{padding:7px 12px;border:2px solid #ddd;border-radius:18px;font-size:.8rem;outline:none;background:#fff}
+.sg input:focus,.sg select:focus{border-color:#4CAF50}
+.bg2{display:flex;gap:5px;flex-wrap:wrap}
+.bt{padding:7px 14px;border:none;border-radius:18px;font-size:.74rem;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:4px;transition:.3s;white-space:nowrap}
+.bt:hover{transform:translateY(-1px)}
+.ba{background:linear-gradient(135deg,#4CAF50,#388E3C);color:#fff}
+.be{background:linear-gradient(135deg,#217346,#185C37);color:#fff}
+.bb{background:linear-gradient(135deg,#FF9800,#E65100);color:#fff}
+.br{background:linear-gradient(135deg,#9C27B0,#6A1B9A);color:#fff}
+.bp{background:linear-gradient(135deg,#607D8B,#37474F);color:#fff}
+.sm{padding:3px 8px;font-size:.64rem;border-radius:10px}
+.s1{background:#2196F3;color:#fff}.s2{background:#FF9800;color:#fff}.s3{background:#f44336;color:#fff}
+.s4{background:#e0e0e0;color:#555}.s5{background:linear-gradient(135deg,#4CAF50,#388E3C);color:#fff}
+.tw2{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 5px 18px rgba(0,0,0,.15)}
+.ts{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:1100px}
+thead tr{background:linear-gradient(135deg,#0a3d1f,#1e8a5a)}
+thead th{padding:10px 7px;color:#fff;text-align:left;font-size:.65rem;text-transform:uppercase;white-space:nowrap}
+tbody tr{border-bottom:1px solid #f0f0f0;transition:.15s}
+tbody tr:hover{background:#f0fff4}
+tbody tr:nth-child(even){background:#fafafa}
+tbody td{padding:8px 7px;font-size:.74rem;color:#333;white-space:nowrap}
+.bd{padding:2px 9px;border-radius:12px;font-size:.6rem;font-weight:700;text-transform:uppercase}
+.bd-a{background:#e8f5e9;color:#2e7d32}.bd-i{background:#ffebee;color:#c62828}.bd-p{background:#fff3e0;color:#e65100}
+.ab{display:flex;gap:2px}
+.nd{text-align:center;padding:30px;color:#aaa}.nd span{font-size:2rem;display:block;margin-bottom:5px}
+.pg{display:flex;justify-content:center;padding:11px;gap:3px;flex-wrap:wrap}
+.pg button{padding:4px 10px;border:1.5px solid #ddd;background:#fff;border-radius:5px;cursor:pointer;font-weight:600;font-size:.72rem}
+.pg button.on,.pg button:hover{background:#4CAF50;color:#fff;border-color:#4CAF50}
+.pg button:disabled{opacity:.4;cursor:not-allowed}
 
-        /* LOGIN */
-        #loginPage{display:flex;justify-content:center;align-items:center;min-height:100vh;padding:15px}
-        #homePage{display:none;padding:10px}
-        .lbox{width:100%;max-width:420px}
-        .logo{text-align:center;margin-bottom:22px}
-        .logo span{font-size:3.5rem;display:block;animation:bounce 2s infinite}
-        @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-        .logo h1{color:white;font-size:1.6rem;text-shadow:2px 2px 4px rgba(0,0,0,0.3)}
-        .logo p{color:#a8e6cf;font-size:0.82rem;margin-top:4px}
-        .crd{background:white;border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,0.3);overflow:hidden;animation:sUp .4s ease}
-        @keyframes sUp{from{transform:translateY(35px);opacity:0}to{transform:translateY(0);opacity:1}}
-        .ch{background:linear-gradient(135deg,#1a5c34,#2d8b5e);padding:16px 20px;text-align:center}
-        .ch h2{color:white;font-size:1.15rem}.ch p{color:#a8e6cf;font-size:.75rem;margin-top:3px}
-        .conn{text-align:center;padding:7px;font-size:.72rem;font-weight:600}
-        .c-on{background:#e8f5e9;color:#2e7d32}.c-off{background:#ffebee;color:#c62828}.c-wait{background:#fff3e0;color:#e65100}
-        .tabs{display:flex;background:#f5f5f5}
-        .tab{flex:1;padding:12px;text-align:center;cursor:pointer;font-weight:600;font-size:.85rem;color:#888;border-bottom:3px solid transparent;transition:.3s}
-        .tab:hover{color:#333}.tab.on{color:#4CAF50;border-bottom-color:#4CAF50;background:white}
-        .fa{padding:20px}
-        .fb{display:none}.fb.on{display:block}
-        .ig{margin-bottom:14px}
-        .ig label{display:block;font-size:.78rem;color:#555;margin-bottom:4px;font-weight:600}
-        .ig .rq{color:#f44336}
-        .iw{position:relative}
-        .iw .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:1rem}
-        .iw input{width:100%;padding:11px 13px 11px 38px;border:2px solid #e0e0e0;border-radius:11px;font-size:.9rem;outline:none;transition:.3s}
-        .iw input:focus{border-color:#4CAF50;box-shadow:0 0 0 3px rgba(76,175,80,.1)}
-        .iw .tp{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1rem;user-select:none}
-        .ig .ht{font-size:.68rem;color:#999;margin-top:3px}
-        .rem{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:.78rem}
-        .rem label{display:flex;align-items:center;gap:4px;cursor:pointer;color:#666}
-        .rem a{color:#4CAF50;text-decoration:none;font-weight:600}
-        .ba2{width:100%;padding:12px;border:none;border-radius:11px;font-size:.92rem;font-weight:700;cursor:pointer;transition:.3s;display:flex;align-items:center;justify-content:center;gap:6px}
-        .ba2:hover{transform:translateY(-2px)}.ba2:active{transform:scale(.98)}
-        .bgr{background:linear-gradient(135deg,#4CAF50,#388E3C);color:white;box-shadow:0 3px 12px rgba(76,175,80,.4)}
-        .bbl{background:linear-gradient(135deg,#2196F3,#1976D2);color:white;box-shadow:0 3px 12px rgba(33,150,243,.4)}
-        .bld{pointer-events:none;opacity:.7}
-        .dv{text-align:center;margin:14px 0;position:relative}
-        .dv::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:#e0e0e0}
-        .dv span{background:white;padding:0 12px;position:relative;color:#999;font-size:.78rem}
-        .msg{padding:9px 13px;border-radius:9px;margin-bottom:12px;font-size:.8rem;font-weight:600;display:none;animation:fIn .3s}
-        @keyframes fIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-        .msg.show{display:block}.msg-e{background:#ffebee;color:#c62828;border:1px solid #ef9a9a}.msg-s{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
-        .cft{text-align:center;padding:10px;background:#f8f9fa;font-size:.72rem;color:#888}
-        .spn{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top:2px solid white;border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
-        @keyframes spin{to{transform:rotate(360deg)}}
+/* MODAL */
+.ov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:999;justify-content:center;align-items:center;backdrop-filter:blur(3px)}
+.ov.op{display:flex}
+.ml{background:#fff;border-radius:15px;width:92%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 35px rgba(0,0,0,.3);animation:pu .2s ease}
+@keyframes pu{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+.mh{background:linear-gradient(135deg,#0a3d1f,#1e8a5a);color:#fff;padding:12px 15px;display:flex;justify-content:space-between;align-items:center;border-radius:15px 15px 0 0}
+.mh h3{font-size:.95rem}
+.cb{background:rgba(255,255,255,.2);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+.cb:hover{background:rgba(255,255,255,.4)}
+.md{padding:15px}.mf{padding:7px 15px 15px;display:flex;justify-content:flex-end;gap:6px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fi{display:flex;flex-direction:column}.fi.fw{grid-column:1/-1}
+.fi label{font-size:.7rem;color:#555;margin-bottom:3px;font-weight:600}.fi .r{color:red}
+.fi input,.fi select,.fi textarea{padding:8px 10px;border:2px solid #e0e0e0;border-radius:7px;font-size:.82rem;outline:none;transition:.3s}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:#4CAF50;box-shadow:0 0 0 3px rgba(76,175,80,.08)}
+.fi textarea{min-height:45px;resize:vertical}
+.vg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.vi{padding:8px;background:#f5f5f5;border-radius:7px;border-left:3px solid #4CAF50}
+.vi.fw{grid-column:1/-1}
+.vi .vl{font-size:.6rem;color:#888;text-transform:uppercase;letter-spacing:.3px}
+.vi .vv{font-size:.8rem;color:#222;font-weight:600;margin-top:2px;word-break:break-all}
 
-        /* HOME */
-        .tb2{background:rgba(255,255,255,.12);border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(10px);flex-wrap:wrap;gap:6px}
-        .tb2 h1{color:#fff;font-size:1.15rem}.tb2 p{color:#a8e6cf;font-size:.68rem}
-        .tr2{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-        .ui2{background:rgba(255,255,255,.15);padding:5px 12px;border-radius:20px;color:white;font-size:.75rem;cursor:pointer}
-        .ui2 strong{color:#a8e6cf}
-        .sb2{padding:4px 12px;border-radius:15px;font-size:.66rem;font-weight:700}
-        .sb-on{background:#4CAF50;color:white}.sb-off{background:#FF9800;color:white}
-        .bo2{padding:5px 12px;border:1.5px solid rgba(255,255,255,.3);background:transparent;color:white;border-radius:20px;cursor:pointer;font-weight:600;font-size:.75rem}
-        .bo2:hover{background:rgba(255,255,255,.2)}
-        .sts{display:flex;gap:7px;margin-bottom:8px;flex-wrap:wrap}
-        .sc{flex:1;min-width:100px;background:rgba(255,255,255,.95);border-radius:10px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-        .sc .n{font-size:1.3rem;font-weight:bold;color:#0a3d1f}.sc .l{color:#666;font-size:.65rem;margin-top:2px}
-        .sc.c1{border-top:3px solid #2196F3}.sc.c2{border-top:3px solid #4CAF50}.sc.c3{border-top:3px solid #f44336}.sc.c4{border-top:3px solid #FF9800}
-        .ct{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px}
-        .sb{display:flex;gap:5px;flex-wrap:wrap}
-        .sb input,.sb select{padding:8px 12px;border:2px solid #ddd;border-radius:20px;font-size:.8rem;outline:none;background:white}
-        .sb input:focus,.sb select:focus{border-color:#4CAF50}
-        .bg3{display:flex;gap:5px;flex-wrap:wrap}
-        .btn{padding:8px 15px;border:none;border-radius:20px;font-size:.76rem;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:4px;transition:.3s;white-space:nowrap}
-        .btn:hover{transform:translateY(-1px)}
-        .b-a{background:linear-gradient(135deg,#4CAF50,#388E3C);color:white}.b-e{background:linear-gradient(135deg,#217346,#185C37);color:white}
-        .b-b{background:linear-gradient(135deg,#FF9800,#F57C00);color:white}.b-r{background:linear-gradient(135deg,#9C27B0,#7B1FA2);color:white}
-        .b-p{background:linear-gradient(135deg,#607D8B,#455A64);color:white}
-        .sm{padding:3px 8px;font-size:.66rem;border-radius:12px}
-        .sv2{background:#2196F3;color:white}.se2{background:#FF9800;color:white}.sd2{background:#f44336;color:white}
-        .sc2{background:#e0e0e0;color:#555}.ss2{background:linear-gradient(135deg,#4CAF50,#388E3C);color:white}
-        .tbx{background:white;border-radius:12px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.2)}
-        .tw{overflow-x:auto}
-        table{width:100%;border-collapse:collapse;min-width:1100px}
-        thead{background:linear-gradient(135deg,#0a3d1f,#1e8a5a)}
-        thead th{padding:11px 7px;color:white;text-align:left;font-size:.66rem;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
-        tbody tr{border-bottom:1px solid #f0f0f0;transition:background .15s}
-        tbody tr:hover{background:#eeffee}tbody tr:nth-child(even){background:#fafafa}
-        tbody td{padding:8px 7px;font-size:.76rem;color:#333;white-space:nowrap}
-        .bdg{padding:2px 10px;border-radius:14px;font-size:.62rem;font-weight:600;text-transform:uppercase}
-        .g1{background:#e8f5e9;color:#2e7d32}.g2{background:#ffebee;color:#c62828}.g3{background:#fff3e0;color:#e65100}
-        .acts{display:flex;gap:2px}
-        .pag{display:flex;justify-content:center;padding:12px;gap:3px;flex-wrap:wrap}
-        .pag button{padding:5px 10px;border:1.5px solid #e0e0e0;background:white;border-radius:6px;cursor:pointer;font-weight:600;font-size:.72rem}
-        .pag button:hover,.pag button.act{background:#4CAF50;color:white;border-color:#4CAF50}
-        .pag button:disabled{opacity:.4;cursor:not-allowed}
-        .nd{text-align:center;padding:30px;color:#999}.nd span{font-size:2rem;display:block;margin-bottom:6px}
-        .ov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:1000;justify-content:center;align-items:center;backdrop-filter:blur(3px)}
-        .ov.on{display:flex}
-        .ml{background:white;border-radius:16px;width:92%;max-width:660px;max-height:90vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.3);animation:mU .2s ease}
-        @keyframes mU{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-        .mh{background:linear-gradient(135deg,#0a3d1f,#1e8a5a);color:white;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;border-radius:16px 16px 0 0}
-        .mh h2{font-size:1rem}
-        .cx{background:rgba(255,255,255,.2);border:none;color:white;font-size:1.1rem;cursor:pointer;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-        .cx:hover{background:rgba(255,255,255,.4)}
-        .mb{padding:16px}.mf{padding:8px 16px 16px;display:flex;justify-content:flex-end;gap:6px}
-        .fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-        .fi{display:flex;flex-direction:column}.fi.fw{grid-column:1/-1}
-        .fi label{font-size:.72rem;color:#555;margin-bottom:3px;font-weight:600}.fi .rq{color:#f44336}
-        .fi input,.fi select,.fi textarea{padding:8px 10px;border:2px solid #e0e0e0;border-radius:8px;font-size:.84rem;outline:none;transition:.3s}
-        .fi input:focus,.fi select:focus,.fi textarea:focus{border-color:#4CAF50;box-shadow:0 0 0 3px rgba(76,175,80,.08)}
-        .fi textarea{resize:vertical;min-height:48px}
-        .vg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-        .vx{padding:9px;background:#f8f9fa;border-radius:8px;border-left:3px solid #4CAF50}
-        .vx.fw{grid-column:1/-1}
-        .vx label{font-size:.62rem;color:#888;text-transform:uppercase;letter-spacing:.3px}
-        .vx p{font-size:.82rem;color:#333;font-weight:600;margin-top:2px;word-break:break-all}
-        .toast{position:fixed;top:10px;right:10px;padding:10px 16px;border-radius:8px;color:white;font-weight:600;z-index:3000;animation:tI .3s ease;box-shadow:0 3px 10px rgba(0,0,0,.2);max-width:300px;font-size:.78rem}
-        .t-s{background:#4CAF50}.t-e{background:#f44336}.t-w{background:#FF9800}
-        @keyframes tI{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
-        @media(max-width:768px){.tb2{flex-direction:column;text-align:center}.fg,.vg{grid-template-columns:1fr}.sts{flex-direction:column}.ct{flex-direction:column;align-items:stretch}.sb,.bg3{flex-direction:column}.tr2{justify-content:center}}
-        @media print{body{background:white}#loginPage,.tb2,.ct,.acts,.pag,.bg3,.sts,.btn,.sb2{display:none!important}#homePage{display:block!important}.tbx{box-shadow:none}}
-    </style>
+/* TOAST */
+.toast{position:fixed;top:10px;right:10px;padding:10px 15px;border-radius:8px;color:#fff;font-weight:600;z-index:9999;box-shadow:0 3px 10px rgba(0,0,0,.2);font-size:.76rem;animation:ti .3s ease;max-width:270px}
+.t-s{background:#4CAF50}.t-e{background:#f44336}.t-w{background:#FF9800}
+@keyframes ti{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+@media(max-width:700px){.fg,.vg{grid-template-columns:1fr}.sr{flex-direction:column}.tp{flex-direction:column;text-align:center}.tp-r{justify-content:center}.ct{flex-direction:column;align-items:stretch}.sg,.bg2{flex-direction:column}}
+@media print{body{background:#fff}#LOGIN,.tp,.ct,.ab,.pg,.bg2,.sr,.bt,.sb,.uc,.bo{display:none!important}#HOME,.tw2{display:block!important;box-shadow:none}}
+</style>
 </head>
 <body>
 
-<!-- LOGIN PAGE -->
-<div id="loginPage">
+<!-- ======= LOGIN ======= -->
+<div id="LOGIN">
 <div class="lbox">
-    <div class="logo"><span>🌾</span><h1>Farmer Database</h1><p>किसान डेटाबेस | Firebase Cloud Powered</p></div>
-    <div class="crd">
-        <div class="ch"><h2>🔐 Welcome!</h2><p>Login or Register</p></div>
-        <div class="conn c-wait" id="connSt">🔄 Connecting to Firebase...</div>
-        <div class="tabs">
-            <div class="tab on" onclick="swT('login')">🔑 Login</div>
-            <div class="tab" onclick="swT('reg')">📝 Register</div>
-        </div>
-        <div class="fa">
-            <div class="msg" id="aMsg"></div>
-            <div class="fb on" id="loginF">
-                <div class="ig"><label>📱 Mobile <span class="rq">*</span></label><div class="iw"><span class="ic">📱</span><input type="tel" id="lM" placeholder="10-digit" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')"></div></div>
-                <div class="ig"><label>🔒 Password <span class="rq">*</span></label><div class="iw"><span class="ic">🔒</span><input type="password" id="lP" placeholder="Password"><span class="tp" onclick="tP('lP',this)">👁️</span></div></div>
-                <div class="rem"><label><input type="checkbox" id="remMe" checked> Remember</label><a href="#" onclick="forgotP();return false">Forgot?</a></div>
-                <button class="ba2 bgr" onclick="doLogin()" id="lBtn">🔑 Login</button>
-                <div class="dv"><span>New?</span></div>
-                <button class="ba2 bbl" onclick="swT('reg')">📝 Create Account</button>
-            </div>
-            <div class="fb" id="regF">
-                <div class="ig"><label>👤 Name <span class="rq">*</span></label><div class="iw"><span class="ic">👤</span><input id="rN" placeholder="Full name"></div></div>
-                <div class="ig"><label>📱 Mobile <span class="rq">*</span></label><div class="iw"><span class="ic">📱</span><input type="tel" id="rM" placeholder="10-digit" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')"></div><div class="ht">📌 Login ID - kahi bhi login karo</div></div>
-                <div class="ig"><label>🔒 Password <span class="rq">*</span></label><div class="iw"><span class="ic">🔒</span><input type="password" id="rP" placeholder="Min 4 chars"><span class="tp" onclick="tP('rP',this)">👁️</span></div></div>
-                <div class="ig"><label>🔒 Confirm <span class="rq">*</span></label><div class="iw"><span class="ic">🔒</span><input type="password" id="rC" placeholder="Re-enter"><span class="tp" onclick="tP('rC',this)">👁️</span></div></div>
-                <button class="ba2 bgr" onclick="doReg()" id="rBtn">📝 Create Account</button>
-                <div class="dv"><span>Have account?</span></div>
-                <button class="ba2 bbl" onclick="swT('login')">🔑 Login</button>
-            </div>
-        </div>
-        <div class="cft">☁️ Firebase Cloud | Data safe forever | v4.0</div>
-    </div>
+<div class="logo"><span>🌾</span><h1>Farmer Database</h1><small>किसान डेटाबेस | Firebase Cloud</small></div>
+<div class="crd">
+<div class="ch"><h2>🔐 Welcome!</h2><small>Login ya Register karein</small></div>
+<div class="cn cn-y" id="connSt">🔄 Firebase se connect ho raha hai...</div>
+<div class="tbs">
+<div class="tb on" id="t1" onclick="swT('l')">🔑 Login</div>
+<div class="tb" id="t2" onclick="swT('r')">📝 Register</div>
+</div>
+<div class="fa">
+<div class="al" id="alrt"></div>
+<div class="fs on" id="fL">
+<div class="ig"><label>📱 Mobile <span class="r">*</span></label><div class="iw"><span class="ic">📱</span><input type="tel" id="lM" placeholder="10-digit mobile" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')"></div></div>
+<div class="ig"><label>🔒 Password <span class="r">*</span></label><div class="iw"><span class="ic">🔒</span><input type="password" id="lP" placeholder="Password"><span class="ey" onclick="te('lP',this)">👁️</span></div></div>
+<div class="rm"><label><input type="checkbox" id="rem" checked> Remember</label><a href="#" onclick="fp();return false">Forgot?</a></div>
+<button class="bf bg" id="lB" onclick="doLogin()">🔑 Login</button>
+<div class="dv">or</div>
+<button class="bf bu" onclick="swT('r')">📝 New Account</button>
+</div>
+<div class="fs" id="fR">
+<div class="ig"><label>👤 Name <span class="r">*</span></label><div class="iw"><span class="ic">👤</span><input id="rN" placeholder="Full name"></div></div>
+<div class="ig"><label>📱 Mobile <span class="r">*</span></label><div class="iw"><span class="ic">📱</span><input type="tel" id="rM" placeholder="10 digit" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')"></div><div class="hn">📌 Login ID - kisi bhi device pe login karo</div></div>
+<div class="ig"><label>🔒 Password <span class="r">*</span></label><div class="iw"><span class="ic">🔒</span><input type="password" id="rP" placeholder="Min 4 chars"><span class="ey" onclick="te('rP',this)">👁️</span></div></div>
+<div class="ig"><label>🔒 Confirm <span class="r">*</span></label><div class="iw"><span class="ic">🔒</span><input type="password" id="rC" placeholder="Re-enter"><span class="ey" onclick="te('rC',this)">👁️</span></div></div>
+<button class="bf bg" id="rB" onclick="doReg()">📝 Create Account</button>
+<div class="dv">or</div>
+<button class="bf bu" onclick="swT('l')">🔑 Login</button>
+</div>
+</div>
+<div class="cf">☁️ Firebase Cloud | Data safe forever</div>
+</div>
 </div>
 </div>
 
-<!-- HOME PAGE -->
-<div id="homePage">
-    <div class="tb2">
-        <div><h1>🌾 Farmer Database</h1><p id="welc"></p></div>
-        <div class="tr2">
-            <span class="sb2 sb-off" id="syncB">⏳</span>
-            <div class="ui2" id="uDsp">👤</div>
-            <button class="bo2" onclick="doOut()">🚪 Logout</button>
-        </div>
-    </div>
-    <div class="sts">
-        <div class="sc c1"><div class="n" id="sT">0</div><div class="l">📊 Total</div></div>
-        <div class="sc c2"><div class="n" id="sA">0</div><div class="l">✅ Active</div></div>
-        <div class="sc c3"><div class="n" id="sI">0</div><div class="l">❌ Inactive</div></div>
-        <div class="sc c4"><div class="n" id="sP">0</div><div class="l">⏳ Pending</div></div>
-    </div>
-    <div class="ct">
-        <div class="sb"><input id="src" placeholder="🔍 Search..." oninput="render()"><select id="flt" onchange="render()"><option value="all">All</option><option value="Active">Active</option><option value="Inactive">Inactive</option><option value="Pending">Pending</option></select></div>
-        <div class="bg3">
-            <button class="btn b-a" onclick="openAdd()">➕ Add</button>
-            <button class="btn b-e" onclick="expCSV()">📗 Excel</button>
-            <button class="btn b-b" onclick="bkp()">💾 Backup</button>
-            <button class="btn b-r" onclick="rst()">📥 Restore</button>
-            <button class="btn b-p" onclick="window.print()">🖨️</button>
-        </div>
-    </div>
-    <div class="tbx"><div class="tw"><table><thead><tr><th>S.No</th><th>Code</th><th>Name</th><th>Aadhar</th><th>Address</th><th>Bank</th><th>A/C</th><th>IFSC</th><th>Branch</th><th>Mobile</th><th>Status</th><th>Action</th></tr></thead><tbody id="tb"></tbody></table></div><div class="pag" id="pgn"></div></div>
-
-    <div class="ov" id="fOv"><div class="ml"><div class="mh"><h2 id="mTi">➕ Add</h2><button class="cx" onclick="cFm()">&times;</button></div><div class="mb"><input type="hidden" id="eIdx" value=""><div class="fg"><div class="fi"><label>Code <span class="rq">*</span></label><input id="f1"></div><div class="fi"><label>Name <span class="rq">*</span></label><input id="f2"></div><div class="fi"><label>Aadhar <span class="rq">*</span></label><input id="f3" maxlength="14" oninput="fmA(this)"></div><div class="fi"><label>Mobile <span class="rq">*</span></label><input id="f4" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')"></div><div class="fi fw"><label>Address <span class="rq">*</span></label><textarea id="f5"></textarea></div><div class="fi"><label>Bank <span class="rq">*</span></label><input id="f6"></div><div class="fi"><label>A/C <span class="rq">*</span></label><input id="f7"></div><div class="fi"><label>IFSC <span class="rq">*</span></label><input id="f8" style="text-transform:uppercase"></div><div class="fi"><label>Branch</label><input id="f9"></div><div class="fi"><label>Status</label><select id="f10"><option value="Active">Active</option><option value="Pending">Pending</option><option value="Inactive">Inactive</option></select></div></div></div><div class="mf"><button class="btn sc2" onclick="cFm()">Cancel</button><button class="btn ss2" onclick="saveF()">💾 Save</button></div></div></div>
-
-    <div class="ov" id="vOv"><div class="ml"><div class="mh"><h2>👁️ Details</h2><button class="cx" onclick="cVm()">&times;</button></div><div class="mb"><div class="vg" id="vCt"></div></div><div class="mf"><button class="btn sc2" onclick="cVm()">Close</button></div></div></div>
+<!-- ======= HOME ======= -->
+<div id="HOME" class="hide">
+<div class="tp">
+<div><h2>🌾 Farmer Database</h2><small id="wm"></small></div>
+<div class="tp-r">
+<span class="sb sb-y" id="syB">⏳</span>
+<div class="uc">👤 <b id="uN"></b></div>
+<button class="bo" onclick="doOut()">🚪 Logout</button>
 </div>
+</div>
+<div class="sr">
+<div class="sc c1"><div class="nm" id="sT">0</div><div class="lb">📊 Total</div></div>
+<div class="sc c2"><div class="nm" id="sA">0</div><div class="lb">✅ Active</div></div>
+<div class="sc c3"><div class="nm" id="sI">0</div><div class="lb">❌ Inactive</div></div>
+<div class="sc c4"><div class="nm" id="sP">0</div><div class="lb">⏳ Pending</div></div>
+</div>
+<div class="ct">
+<div class="sg"><input id="src" placeholder="🔍 Search..." oninput="render()"><select id="flt" onchange="render()"><option value="all">All</option><option value="Active">Active</option><option value="Inactive">Inactive</option><option value="Pending">Pending</option></select></div>
+<div class="bg2">
+<button class="bt ba" onclick="openAdd()">➕ Add</button>
+<button class="bt be" onclick="expCSV()">📗 Excel</button>
+<button class="bt bb" onclick="bkp()">💾 Backup</button>
+<button class="bt br" onclick="rst()">📥 Restore</button>
+<button class="bt bp" onclick="window.print()">🖨️</button>
+</div>
+</div>
+<div class="tw2"><div class="ts"><table><thead><tr><th>S.No</th><th>Code</th><th>Name</th><th>Aadhar</th><th>Address</th><th>Bank</th><th>A/C</th><th>IFSC</th><th>Branch</th><th>Mobile</th><th>Status</th><th>Action</th></tr></thead><tbody id="tbd"></tbody></table></div><div class="pg" id="pgr"></div></div>
+</div>
+
+<!-- ADD/EDIT -->
+<div class="ov" id="fMd">
+<div class="ml"><div class="mh"><h3 id="mTl">➕ Add</h3><button class="cb" onclick="cFM()">×</button></div>
+<div class="md"><input type="hidden" id="eK" value="">
+<div class="fg">
+<div class="fi"><label>Code <span class="r">*</span></label><input id="i1"></div>
+<div class="fi"><label>Name <span class="r">*</span></label><input id="i2"></div>
+<div class="fi"><label>Aadhar <span class="r">*</span></label><input id="i3" maxlength="14" oninput="fA(this)"></div>
+<div class="fi"><label>Mobile <span class="r">*</span></label><input id="i4" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')"></div>
+<div class="fi fw"><label>Address <span class="r">*</span></label><textarea id="i5"></textarea></div>
+<div class="fi"><label>Bank <span class="r">*</span></label><input id="i6"></div>
+<div class="fi"><label>A/C <span class="r">*</span></label><input id="i7"></div>
+<div class="fi"><label>IFSC <span class="r">*</span></label><input id="i8" style="text-transform:uppercase"></div>
+<div class="fi"><label>Branch</label><input id="i9"></div>
+<div class="fi"><label>Status</label><select id="i10"><option value="Active">Active</option><option value="Pending">Pending</option><option value="Inactive">Inactive</option></select></div>
+</div></div>
+<div class="mf"><button class="bt s4" onclick="cFM()">Cancel</button><button class="bt s5" onclick="saveF()">💾 Save</button></div>
+</div></div>
+
+<!-- VIEW -->
+<div class="ov" id="vMd">
+<div class="ml"><div class="mh"><h3>👁️ Details</h3><button class="cb" onclick="cVM()">×</button></div>
+<div class="md"><div class="vg" id="vCt"></div></div>
+<div class="mf"><button class="bt s4" onclick="cVM()">Close</button></div>
+</div></div>
 
 <script>
 // ================================================================
-// 🔥 FIREBASE CONFIG - APNA CONFIG PASTE KARO
+// 🔥 FIREBASE CONFIG
+// ⬇️ APNA CONFIG YAHAN PASTE KARO (Firebase Console se copy karo)
 // ================================================================
-const firebaseConfig = {
-  apiKey: "AIzaSyDLrpJRQcgo9jmXP4p62uDCjEFDQhyHkTE",
-  authDomain: "farmer-database-9122d.firebaseapp.com",
-  databaseURL: "https://farmer-database-9122d-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "farmer-database-9122d",
-  storageBucket: "farmer-database-9122d.firebasestorage.app",
-  messagingSenderId: "401983756635",
-  appId: "1:401983756635:web:e7b2251da9cff9384e227e",
-  measurementId: "G-WK2G7JK4BN"
+var FBCONFIG = {
+    apiKey: "AIzaSyCTliTeD9vAv1Di5paG6v_ovoJaKHdNgbI",
+    authDomain: "farmerdb-ba9b0.firebaseapp.com",
+    databaseURL: "https://farmerdb-ba9b0-default-rtdb.firebaseio.com",
+    projectId: "farmerdb-ba9b0",
+    storageBucket: "farmerdb-ba9b0.firebasestorage.app",
+    messagingSenderId: "703428321974",
+    appId: "1:703428321974:web:7ba472d25d062dc1027c17"
 };
 // ================================================================
+// ⬆️ REPLACE the above with YOUR firebase config
+// ================================================================
 
-let db = null;
-let CU = null;       // Current User {mobile, name}
-let FD = [];         // Farmer Data array
-let FKEYS = {};      // Firebase keys mapping {index: firebaseKey}
-let isOnline = false;
-let farmerRef = null;
-let pg = 1;
-const PP = 10;
+var db = null;
+var CU = null;
+var FD = [];
+var FK = {};
+var cloud = false;
+var fRef = null;
+var _pg = 1;
+var _pp = 10;
+
+// ================================================================
+// 🚀 APP START
+// ================================================================
+window.onload = function(){
+    initFB();
+    checkSess();
+
+    document.addEventListener('keydown',function(e){
+        if(e.key==='Escape'){cFM();cVM();}
+        if(e.key==='Enter'){
+            var lf=document.getElementById('fL');
+            if(lf&&lf.classList.contains('on'))doLogin();
+            else{var rf=document.getElementById('fR');if(rf&&rf.classList.contains('on'))doReg();}
+        }
+    });
+    document.getElementById('fMd').onclick=function(e){if(e.target===this)cFM();};
+    document.getElementById('vMd').onclick=function(e){if(e.target===this)cVM();};
+};
 
 // ================================================================
 // 🔥 FIREBASE INIT
 // ================================================================
-function initFirebase() {
-    try {
-        if (FIREBASE_CONFIG.apiKey === "YOUR_API_KEY") {
-            setConn('off');
-            toast('⚠️ Firebase config daalo!', 'w');
+function initFB(){
+    try{
+        if(FBCONFIG.apiKey==="YOUR_API_KEY"){
+            setCS('no');
             return;
         }
-
-        firebase.initializeApp(FIREBASE_CONFIG);
-        db = firebase.database();
-
-        db.ref('.info/connected').on('value', function(snap) {
-            isOnline = snap.val() === true;
-            setConn(isOnline ? 'on' : 'off');
+        firebase.initializeApp(FBCONFIG);
+        db=firebase.database();
+        db.ref('.info/connected').on('value',function(s){
+            cloud=s.val()===true;
+            setCS(cloud?'yes':'off');
         });
-
-        setConn('on');
-    } catch(e) {
-        console.error('Firebase init error:', e);
-        setConn('off');
+        setCS('yes');
+    }catch(e){
+        console.error('FB Error:',e);
+        setCS('no');
     }
 }
 
-function setConn(s) {
-    const el = document.getElementById('connSt');
-    const sb = document.getElementById('syncB');
-    if (s === 'on') {
-        if(el) { el.className = 'conn c-on'; el.textContent = '☁️ Firebase Connected ✅'; }
-        if(sb) { sb.className = 'sb2 sb-on'; sb.textContent = '☁️ Synced'; }
-    } else {
-        if(el) { el.className = 'conn c-off'; el.textContent = '❌ Firebase not connected'; }
-        if(sb) { sb.className = 'sb2 sb-off'; sb.textContent = '📴 Offline'; }
-    }
-}
-
-// ================================================================
-// 🔐 AUTH - REGISTER
-// ================================================================
-async function doReg() {
-    const name = document.getElementById('rN').value.trim();
-    const mob = document.getElementById('rM').value.trim();
-    const pass = document.getElementById('rP').value;
-    const conf = document.getElementById('rC').value;
-
-    if (!name) { sMsg('❌ Name required!','e'); return; }
-    if (mob.length !== 10) { sMsg('❌ 10-digit mobile!','e'); return; }
-    if (pass.length < 4) { sMsg('❌ Min 4 char password!','e'); return; }
-    if (pass !== conf) { sMsg('❌ Password not matching!','e'); return; }
-
-    const btn = document.getElementById('rBtn');
-    btn.innerHTML = '<div class="spn"></div> Creating...'; btn.classList.add('bld');
-
-    try {
-        if (db && isOnline) {
-            // Check if exists on Firebase
-            const snap = await db.ref('users/' + mob).once('value');
-            if (snap.exists()) {
-                sMsg('❌ Mobile already registered! Login karein.','e');
-                rBtn2(btn, '📝 Create Account'); return;
-            }
-
-            // Save to Firebase
-            await db.ref('users/' + mob).set({
-                name: name, mobile: mob,
-                password: btoa(pass),
-                created: new Date().toISOString()
-            });
-        }
-
-        // Also save locally always
-        const lu = JSON.parse(localStorage.getItem('USERS') || '{}');
-        if (lu[mob]) { sMsg('❌ Already registered!','e'); rBtn2(btn,'📝 Create Account'); return; }
-        lu[mob] = { name, mobile: mob, password: btoa(pass), created: new Date().toISOString() };
-        localStorage.setItem('USERS', JSON.stringify(lu));
-
-        sMsg('✅ Account created! Login karein.','s');
-        document.getElementById('rN').value = '';
-        document.getElementById('rM').value = '';
-        document.getElementById('rP').value = '';
-        document.getElementById('rC').value = '';
-
-        setTimeout(() => { swT('login'); document.getElementById('lM').value = mob; document.getElementById('lP').focus(); rBtn2(btn,'📝 Create Account'); }, 1000);
-
-    } catch(e) {
-        sMsg('❌ Error: ' + e.message,'e');
-        rBtn2(btn, '📝 Create Account');
+function setCS(s){
+    var c=document.getElementById('connSt');
+    var b=document.getElementById('syB');
+    if(s==='yes'){
+        if(c){c.className='cn cn-g';c.textContent='☁️ Firebase Connected ✅';}
+        if(b){b.className='sb sb-g';b.textContent='☁️ Synced';}
+    }else if(s==='off'){
+        if(c){c.className='cn cn-r';c.textContent='📴 Offline - local data use ho raha hai';}
+        if(b){b.className='sb sb-y';b.textContent='📴 Offline';}
+    }else{
+        if(c){c.className='cn cn-y';c.textContent='⚠️ Firebase config daalo (line 53)';}
+        if(b){b.className='sb sb-y';b.textContent='⚠️ Setup';}
     }
 }
 
 // ================================================================
-// 🔐 AUTH - LOGIN
+// 🔐 SESSION CHECK
 // ================================================================
-async function doLogin() {
-    const mob = document.getElementById('lM').value.trim();
-    const pass = document.getElementById('lP').value;
-
-    if (mob.length !== 10) { sMsg('❌ 10-digit mobile!','e'); return; }
-    if (!pass) { sMsg('❌ Password required!','e'); return; }
-
-    const btn = document.getElementById('lBtn');
-    btn.innerHTML = '<div class="spn"></div> Checking...'; btn.classList.add('bld');
-
-    let user = null;
-
-    try {
-        // TRY 1: Firebase se check karo
-        if (db && isOnline) {
-            const snap = await db.ref('users/' + mob).once('value');
-            if (snap.exists()) {
-                user = snap.val();
-                // Local mein bhi save karo
-                const lu = JSON.parse(localStorage.getItem('USERS') || '{}');
-                lu[mob] = user;
-                localStorage.setItem('USERS', JSON.stringify(lu));
-            }
+function checkSess(){
+    try{
+        var s=localStorage.getItem('SESS');
+        if(s){
+            CU=JSON.parse(s);
+            if(CU&&CU.mobile&&CU.name){goHome();return;}
         }
+    }catch(e){}
 
-        // TRY 2: Local se check karo (fallback)
-        if (!user) {
-            const lu = JSON.parse(localStorage.getItem('USERS') || '{}');
-            user = lu[mob] || null;
-        }
-
-        if (!user) {
-            sMsg('❌ Mobile not registered! Account banayein.','e');
-            rBtn2(btn,'🔑 Login'); return;
-        }
-
-        // Password check
-        if (atob(user.password) !== pass) {
-            sMsg('❌ Wrong password!','e');
-            rBtn2(btn,'🔑 Login'); return;
-        }
-
-        // SUCCESS
-        CU = { mobile: mob, name: user.name, loginTime: new Date().toISOString() };
-        localStorage.setItem('SESSION', JSON.stringify(CU));
-
-        if (document.getElementById('remMe').checked) localStorage.setItem('REM', mob);
-        else localStorage.removeItem('REM');
-
-        sMsg('✅ Login successful!','s');
-        setTimeout(() => { rBtn2(btn,'🔑 Login'); showHome(); }, 600);
-
-    } catch(e) {
-        // Final fallback - local
-        const lu = JSON.parse(localStorage.getItem('USERS') || '{}');
-        if (lu[mob] && atob(lu[mob].password) === pass) {
-            CU = { mobile: mob, name: lu[mob].name, loginTime: new Date().toISOString() };
-            localStorage.setItem('SESSION', JSON.stringify(CU));
-            sMsg('✅ Logged in (offline)','s');
-            setTimeout(() => { rBtn2(btn,'🔑 Login'); showHome(); }, 600);
-        } else {
-            sMsg('❌ Login failed!','e');
-            rBtn2(btn,'🔑 Login');
-        }
-    }
+    try{var r=localStorage.getItem('REMU');if(r)document.getElementById('lM').value=r;}catch(e){}
+    goLogin();
 }
 
-// ================================================================
-// 🏠 SHOW HOME - LOAD FARMER DATA
-// ================================================================
-function showHome() {
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('homePage').style.display = 'block';
-    document.getElementById('uDsp').innerHTML = '👤 <strong>' + CU.name + '</strong>';
-    document.getElementById('welc').textContent = '👤 ' + CU.name + ' | 📱 ' + CU.mobile;
+function goLogin(){
+    document.getElementById('LOGIN').classList.remove('hide');
+    document.getElementById('HOME').classList.add('hide');
+}
 
+function goHome(){
+    document.getElementById('LOGIN').classList.add('hide');
+    document.getElementById('HOME').classList.remove('hide');
+    document.getElementById('uN').textContent=CU.name;
+    document.getElementById('wm').textContent='👤 '+CU.name+' | 📱 '+CU.mobile;
     loadFarmers();
 }
 
-function showLogin() {
-    document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('homePage').style.display = 'none';
-    try { const r = localStorage.getItem('REM'); if(r) document.getElementById('lM').value = r; } catch(e) {}
+// ================================================================
+// TAB / HELPERS
+// ================================================================
+function swT(t){
+    hAl();
+    document.getElementById('t1').classList.remove('on');
+    document.getElementById('t2').classList.remove('on');
+    document.getElementById('fL').classList.remove('on');
+    document.getElementById('fR').classList.remove('on');
+    if(t==='l'){document.getElementById('t1').classList.add('on');document.getElementById('fL').classList.add('on');}
+    else{document.getElementById('t2').classList.add('on');document.getElementById('fR').classList.add('on');}
+}
+function te(id,el){var i=document.getElementById(id);if(i.type==='password'){i.type='text';el.textContent='🙈';}else{i.type='password';el.textContent='👁️';}}
+function sAl(m,t){var a=document.getElementById('alrt');a.textContent=m;a.className='al sh al-'+(t==='ok'?'s':'e');setTimeout(hAl,5000);}
+function hAl(){var a=document.getElementById('alrt');if(a)a.className='al';}
+
+// ================================================================
+// 📝 REGISTER - Firebase + Local
+// ================================================================
+async function doReg(){
+    var nm=document.getElementById('rN').value.trim();
+    var mb=document.getElementById('rM').value.trim();
+    var ps=document.getElementById('rP').value;
+    var cf=document.getElementById('rC').value;
+
+    if(!nm){sAl('❌ Name required!','e');return;}
+    if(mb.length!==10){sAl('❌ 10-digit mobile!','e');return;}
+    if(ps.length<4){sAl('❌ Min 4 char password!','e');return;}
+    if(ps!==cf){sAl('❌ Password match nahi!','e');return;}
+
+    var b=document.getElementById('rB');
+    b.innerHTML='<div class="sp"></div> Wait...';b.classList.add('bl');
+
+    var ud={name:nm,mobile:mb,pass:btoa(ps),created:new Date().toISOString()};
+
+    try{
+        // Firebase check + save
+        if(db&&cloud){
+            var sn=await db.ref('users/'+mb).once('value');
+            if(sn.exists()){sAl('❌ Already registered! Login karein.','e');rb(b,'📝 Create Account');return;}
+            await db.ref('users/'+mb).set(ud);
+        }
+
+        // Local save always
+        var lu=JSON.parse(localStorage.getItem('USRS')||'{}');
+        if(lu[mb]&&!db){sAl('❌ Already registered!','e');rb(b,'📝 Create Account');return;}
+        lu[mb]=ud;
+        localStorage.setItem('USRS',JSON.stringify(lu));
+
+        sAl('✅ Account created! Login karein.','ok');
+        document.getElementById('rN').value='';document.getElementById('rM').value='';
+        document.getElementById('rP').value='';document.getElementById('rC').value='';
+        setTimeout(function(){swT('l');document.getElementById('lM').value=mb;document.getElementById('lP').focus();rb(b,'📝 Create Account');},1200);
+    }catch(e){sAl('❌ Error: '+e.message,'e');rb(b,'📝 Create Account');}
 }
 
 // ================================================================
-// 📦 LOAD FARMERS - Firebase listener + Local fallback
+// 🔑 LOGIN - Firebase first, then Local fallback
 // ================================================================
-function loadFarmers() {
-    const localKey = 'FD_' + CU.mobile;
+async function doLogin(){
+    var mb=document.getElementById('lM').value.trim();
+    var ps=document.getElementById('lP').value;
 
-    if (db && isOnline) {
+    if(mb.length!==10){sAl('❌ 10-digit mobile!','e');return;}
+    if(!ps){sAl('❌ Password daalo!','e');return;}
+
+    var b=document.getElementById('lB');
+    b.innerHTML='<div class="sp"></div> Checking...';b.classList.add('bl');
+
+    var user=null;
+
+    try{
+        // TRY FIREBASE FIRST
+        if(db&&cloud){
+            var sn=await db.ref('users/'+mb).once('value');
+            if(sn.exists()){
+                user=sn.val();
+                // Sync to local
+                var lu=JSON.parse(localStorage.getItem('USRS')||'{}');
+                lu[mb]=user;localStorage.setItem('USRS',JSON.stringify(lu));
+            }
+        }
+
+        // FALLBACK LOCAL
+        if(!user){
+            var lu=JSON.parse(localStorage.getItem('USRS')||'{}');
+            user=lu[mb]||null;
+        }
+
+        if(!user){sAl('❌ Not registered! Account banao.','e');rb(b,'🔑 Login');return;}
+        if(atob(user.pass)!==ps){sAl('❌ Wrong password!','e');rb(b,'🔑 Login');return;}
+
+        // SUCCESS
+        CU={name:user.name,mobile:mb};
+        localStorage.setItem('SESS',JSON.stringify(CU));
+        if(document.getElementById('rem').checked)localStorage.setItem('REMU',mb);
+        else localStorage.removeItem('REMU');
+
+        sAl('✅ Login successful!','ok');
+        setTimeout(function(){rb(b,'🔑 Login');goHome();},600);
+    }catch(e){
+        // Final fallback
+        var lu2=JSON.parse(localStorage.getItem('USRS')||'{}');
+        if(lu2[mb]&&atob(lu2[mb].pass)===ps){
+            CU={name:lu2[mb].name,mobile:mb};
+            localStorage.setItem('SESS',JSON.stringify(CU));
+            sAl('✅ Logged in (offline)','ok');
+            setTimeout(function(){rb(b,'🔑 Login');goHome();},600);
+        }else{sAl('❌ Login failed!','e');rb(b,'🔑 Login');}
+    }
+}
+
+function rb(b,t){b.innerHTML=t;b.classList.remove('bl');}
+
+// ================================================================
+// 📦 LOAD FARMERS - Firebase real-time + Local backup
+// ================================================================
+function loadFarmers(){
+    if(!CU)return;
+
+    if(db&&cloud){
         // Firebase real-time listener
-        farmerRef = db.ref('farmerData/' + CU.mobile);
+        fRef=db.ref('farmers/'+CU.mobile);
 
-        farmerRef.on('value', function(snapshot) {
-            FD = [];
-            FKEYS = {};
-            let idx = 0;
-
-            if (snapshot.exists()) {
-                snapshot.forEach(function(child) {
-                    const f = child.val();
-                    FKEYS[idx] = child.key;
+        fRef.on('value',function(snap){
+            FD=[];FK={};
+            var idx=0;
+            if(snap.exists()){
+                snap.forEach(function(ch){
+                    var f=ch.val();
+                    FK[idx]=ch.key; // Save firebase key
                     FD.push(f);
                     idx++;
                 });
             }
-
-            // Always save to local as backup
-            localStorage.setItem(localKey, JSON.stringify(FD));
-            console.log('☁️ Firebase loaded: ' + FD.length + ' farmers');
-
-            setConn('on');
+            // Backup to local
+            localStorage.setItem('FD_'+CU.mobile,JSON.stringify(FD));
+            setCS('yes');
             render();
         });
-
-    } else {
-        // Local fallback
-        try {
-            FD = JSON.parse(localStorage.getItem(localKey) || '[]');
-        } catch(e) { FD = []; }
-
-        console.log('💾 Local loaded: ' + FD.length + ' farmers');
+    }else{
+        // Local only
+        try{FD=JSON.parse(localStorage.getItem('FD_'+CU.mobile)||'[]');}
+        catch(e){FD=[];}
         render();
     }
 }
 
 // ================================================================
-// 💾 SAVE SINGLE FARMER TO FIREBASE
+// 💾 SAVE FARMER - push() for ADD, set() for EDIT
+// → push() = NEVER overwrites, creates NEW unique key
+// → set() on specific key = updates ONLY that record
 // ================================================================
-async function saveToFirebase(farmerData, editKey) {
-    if (!db || !isOnline) return false;
+async function saveF(){
+    if(!vld())return;
 
-    try {
-        const ref = db.ref('farmerData/' + CU.mobile);
+    var d={
+        c:document.getElementById('i1').value.trim(),
+        n:document.getElementById('i2').value.trim(),
+        a:document.getElementById('i3').value.trim(),
+        m:document.getElementById('i4').value.trim(),
+        ad:document.getElementById('i5').value.trim(),
+        b:document.getElementById('i6').value.trim(),
+        ac:document.getElementById('i7').value.trim(),
+        if:document.getElementById('i8').value.trim().toUpperCase(),
+        br:document.getElementById('i9').value.trim(),
+        s:document.getElementById('i10').value,
+        u:new Date().toISOString()
+    };
 
-        if (editKey) {
-            // UPDATE - sirf wo ek farmer update karo
-            await ref.child(editKey).set(farmerData);
-            console.log('☁️ Updated farmer: ' + editKey);
-        } else {
-            // ADD - naya farmer push karo
-            await ref.push(farmerData);
-            console.log('☁️ Added new farmer');
+    var ek=document.getElementById('eK').value; // firebase key or empty
+
+    try{
+        if(ek){
+            // ===== EDIT MODE =====
+            // Find original farmer to keep createdAt
+            var oi=Object.keys(FK).find(function(k){return FK[k]===ek;});
+            d.cr=(oi!==undefined&&FD[oi])?FD[oi].cr||d.u:d.u;
+
+            if(db&&cloud){
+                // Update ONLY this specific record in Firebase
+                await db.ref('farmers/'+CU.mobile+'/'+ek).set(d);
+                // Firebase listener will auto-update FD array
+            }else{
+                // Local update
+                if(oi!==undefined)FD[oi]=d;
+                localStorage.setItem('FD_'+CU.mobile,JSON.stringify(FD));
+                render();
+            }
+            toast('✅ Updated!'+(cloud?' ☁️':' 💾'),'s');
+        }else{
+            // ===== ADD MODE =====
+            // Check duplicate code
+            if(FD.find(function(f){return f.c===d.c;})){toast('❌ Code exists!','e');return;}
+            d.cr=d.u; // created date
+
+            if(db&&cloud){
+                // push() = creates NEW unique key, NEVER overwrites anything
+                await db.ref('farmers/'+CU.mobile).push(d);
+                // Firebase listener will auto-update FD array
+            }else{
+                FD.push(d);
+                localStorage.setItem('FD_'+CU.mobile,JSON.stringify(FD));
+                render();
+            }
+            toast('✅ Added!'+(cloud?' ☁️':' 💾'),'s');
         }
-        return true;
-    } catch(e) {
-        console.error('Firebase save error:', e);
-        return false;
+    }catch(e){
+        // Offline fallback
+        if(ek){
+            var oi2=Object.keys(FK).find(function(k){return FK[k]===ek;});
+            if(oi2!==undefined)FD[oi2]=d;
+        }else{
+            d.cr=d.u;FD.push(d);
+        }
+        localStorage.setItem('FD_'+CU.mobile,JSON.stringify(FD));
+        render();
+        toast('⚠️ Saved offline','w');
+    }
+    cFM();
+}
+
+// ================================================================
+// 🗑️ DELETE - removes ONLY specific record, others SAFE
+// ================================================================
+async function delF(i){
+    if(!confirm('⚠️ "'+FD[i].n+'" delete karein?\n\n💡 Pehle Backup lelo!'))return;
+
+    try{
+        if(db&&cloud&&FK[i]){
+            // Delete ONLY this one record from Firebase
+            await db.ref('farmers/'+CU.mobile+'/'+FK[i]).remove();
+            // Firebase listener auto-updates
+            toast('🗑️ Deleted ☁️','s');
+        }else{
+            FD.splice(i,1);
+            localStorage.setItem('FD_'+CU.mobile,JSON.stringify(FD));
+            render();
+            toast('🗑️ Deleted 💾','s');
+        }
+    }catch(e){
+        FD.splice(i,1);
+        localStorage.setItem('FD_'+CU.mobile,JSON.stringify(FD));
+        render();
+        toast('🗑️ Deleted (offline)','s');
     }
 }
 
 // ================================================================
-// 🗑️ DELETE FROM FIREBASE
+// RENDER TABLE
 // ================================================================
-async function deleteFromFirebase(firebaseKey) {
-    if (!db || !isOnline || !firebaseKey) return false;
+function fA(i){var v=i.value.replace(/\D/g,'');if(v.length>12)v=v.substring(0,12);var r='';for(var x=0;x<v.length;x++){if(x>0&&x%4===0)r+='-';r+=v[x];}i.value=r;}
 
-    try {
-        await db.ref('farmerData/' + CU.mobile + '/' + firebaseKey).remove();
-        console.log('☁️ Deleted from Firebase: ' + firebaseKey);
-        return true;
-    } catch(e) {
-        console.error('Firebase delete error:', e);
-        return false;
-    }
-}
-
-// ================================================================
-// CRUD OPERATIONS
-// ================================================================
-function fmA(i){let v=i.value.replace(/\D/g,'');if(v.length>12)v=v.substring(0,12);let r='';for(let x=0;x<v.length;x++){if(x>0&&x%4===0)r+='-';r+=v[x];}i.value=r;}
-
-function stats(){
+function sts(){
     document.getElementById('sT').textContent=FD.length;
-    document.getElementById('sA').textContent=FD.filter(f=>f.s==='Active').length;
-    document.getElementById('sI').textContent=FD.filter(f=>f.s==='Inactive').length;
-    document.getElementById('sP').textContent=FD.filter(f=>f.s==='Pending').length;
+    document.getElementById('sA').textContent=FD.filter(function(f){return f.s==='Active';}).length;
+    document.getElementById('sI').textContent=FD.filter(function(f){return f.s==='Inactive';}).length;
+    document.getElementById('sP').textContent=FD.filter(function(f){return f.s==='Pending';}).length;
 }
 
 function render(){
-    const s=(document.getElementById('src')||{}).value||'';
-    const sl=s.toLowerCase();
-    const sf=(document.getElementById('flt')||{}).value||'all';
+    var s=(document.getElementById('src')||{}).value||'';
+    var sl=s.toLowerCase();
+    var sf=(document.getElementById('flt')||{}).value||'all';
 
-    let F=FD.filter(f=>{
-        const ms=!sl||(f.n||'').toLowerCase().includes(sl)||(f.c||'').toLowerCase().includes(sl)||(f.a||'').includes(sl)||(f.m||'').includes(sl)||(f.b||'').toLowerCase().includes(sl)||(f.ad||'').toLowerCase().includes(sl);
+    var F=FD.filter(function(f){
+        var ms=!sl||(f.n||'').toLowerCase().indexOf(sl)>-1||(f.c||'').toLowerCase().indexOf(sl)>-1||(f.a||'').indexOf(sl)>-1||(f.m||'').indexOf(sl)>-1||(f.b||'').toLowerCase().indexOf(sl)>-1||(f.ad||'').toLowerCase().indexOf(sl)>-1;
         return ms&&(sf==='all'||f.s===sf);
     });
 
-    const tp=Math.ceil(F.length/PP)||1;
-    if(pg>tp)pg=1;
-    const st=(pg-1)*PP,pd=F.slice(st,st+PP);
-    const tb=document.getElementById('tb');
-    if(!tb)return;
+    var tp=Math.ceil(F.length/_pp)||1;
+    if(_pg>tp)_pg=1;
+    var st=(_pg-1)*_pp,pd=F.slice(st,st+_pp);
+    var tb=document.getElementById('tbd');if(!tb)return;
 
     if(F.length===0){
-        tb.innerHTML=`<tr><td colspan="12"><div class="nd"><span>🌾</span><p>No farmers! Click ➕ Add</p></div></td></tr>`;
-        document.getElementById('pgn').innerHTML='';stats();return;
+        tb.innerHTML='<tr><td colspan="12"><div class="nd"><span>🌾</span>Koi farmer nahi! ➕ Add karo</div></td></tr>';
+        document.getElementById('pgr').innerHTML='';sts();return;
     }
 
-    tb.innerHTML=pd.map((f,i)=>{
-        const gi=FD.indexOf(f);
-        const bc=f.s==='Active'?'g1':f.s==='Inactive'?'g2':'g3';
-        return `<tr><td><b>${st+i+1}</b></td><td><b style="color:#0a3d1f">${f.c||''}</b></td><td>${f.n||''}</td><td>${f.a||''}</td><td title="${f.ad||''}">${(f.ad||'').length>16?(f.ad||'').substring(0,16)+'...':f.ad||''}</td><td>${f.b||''}</td><td>${f.ac||''}</td><td><code>${f.if||''}</code></td><td>${f.br||'-'}</td><td><a href="tel:${f.m}">📞${f.m||''}</a></td><td><span class="bdg ${bc}">${f.s||''}</span></td><td><div class="acts"><button class="btn sm sv2" onclick="viewF(${gi})">👁️</button><button class="btn sm se2" onclick="editF(${gi})">✏️</button><button class="btn sm sd2" onclick="delF(${gi})">🗑️</button></div></td></tr>`;
-    }).join('');
+    var h='';
+    for(var x=0;x<pd.length;x++){
+        var f=pd[x];
+        var gi=FD.indexOf(f);
+        var bc=f.s==='Active'?'bd-a':f.s==='Inactive'?'bd-i':'bd-p';
+        var ad=(f.ad||'').length>16?(f.ad||'').substring(0,16)+'...':f.ad||'';
+        h+='<tr><td><b>'+(st+x+1)+'</b></td><td><b style="color:#0a3d1f">'+(f.c||'')+'</b></td><td>'+(f.n||'')+'</td><td>'+(f.a||'')+'</td><td title="'+(f.ad||'')+'">'+ad+'</td><td>'+(f.b||'')+'</td><td>'+(f.ac||'')+'</td><td><code>'+(f.if||'')+'</code></td><td>'+(f.br||'-')+'</td><td><a href="tel:'+(f.m||'')+'">📞'+(f.m||'')+'</a></td><td><span class="bd '+bc+'">'+(f.s||'')+'</span></td><td><div class="ab"><button class="bt sm s1" onclick="vwF('+gi+')">👁️</button><button class="bt sm s2" onclick="edF('+gi+')">✏️</button><button class="bt sm s3" onclick="delF('+gi+')">🗑️</button></div></td></tr>';
+    }
+    tb.innerHTML=h;
 
-    let ph='';
-    if(tp>1){ph+=`<button onclick="goP(${pg-1})" ${pg===1?'disabled':''}>◀</button>`;for(let i=1;i<=tp;i++)ph+=`<button onclick="goP(${i})" class="${i===pg?'act':''}">${i}</button>`;ph+=`<button onclick="goP(${pg+1})" ${pg===tp?'disabled':''}>▶</button>`;}
-    document.getElementById('pgn').innerHTML=ph;stats();
+    var ph='';
+    if(tp>1){
+        ph+='<button onclick="gP('+(_pg-1)+')" '+(_pg===1?'disabled':'')+'>◀</button>';
+        for(var j=1;j<=tp;j++)ph+='<button onclick="gP('+j+')" class="'+(j===_pg?'on':'')+'">'+j+'</button>';
+        ph+='<button onclick="gP('+(_pg+1)+')" '+(_pg===tp?'disabled':'')+'>▶</button>';
+    }
+    document.getElementById('pgr').innerHTML=ph;
+    sts();
 }
 
-function goP(p){pg=p;render();}
+function gP(p){_pg=p;render();}
 
+// ================================================================
+// MODALS
+// ================================================================
 function openAdd(){
-    document.getElementById('mTi').textContent='➕ Add Farmer';
-    document.getElementById('eIdx').value='';
-    clrF();
-    let mx=0;FD.forEach(f=>{const n=parseInt((f.c||'').replace(/\D/g,''));if(n>mx)mx=n;});
-    document.getElementById('f1').value='FR-'+String(mx+1).padStart(3,'0');
-    document.getElementById('fOv').classList.add('on');
+    document.getElementById('mTl').textContent='➕ Add Farmer';
+    document.getElementById('eK').value='';
+    clF();
+    var mx=0;FD.forEach(function(f){var n=parseInt((f.c||'').replace(/\D/g,''));if(n>mx)mx=n;});
+    document.getElementById('i1').value='FR-'+String(mx+1).padStart(3,'0');
+    document.getElementById('fMd').classList.add('op');
+    setTimeout(function(){document.getElementById('i2').focus();},100);
 }
 
-function cFm(){document.getElementById('fOv').classList.remove('on');}
-function cVm(){document.getElementById('vOv').classList.remove('on');}
-function clrF(){['f1','f2','f3','f4','f5','f6','f7','f8','f9'].forEach(id=>document.getElementById(id).value='');document.getElementById('f10').value='Active';}
+function cFM(){document.getElementById('fMd').classList.remove('op');}
+function cVM(){document.getElementById('vMd').classList.remove('op');}
 
-function valF(){
-    const r=[{id:'f1',n:'Code'},{id:'f2',n:'Name'},{id:'f3',n:'Aadhar'},{id:'f4',n:'Mobile'},{id:'f5',n:'Address'},{id:'f6',n:'Bank'},{id:'f7',n:'A/C'},{id:'f8',n:'IFSC'}];
-    for(let f of r){if(!document.getElementById(f.id).value.trim()){toast('❌ '+f.n+' required!','e');document.getElementById(f.id).focus();return false;}}
-    if(document.getElementById('f3').value.replace(/\D/g,'').length!==12){toast('❌ Aadhar: 12 digits!','e');return false;}
-    if(!/^\d{10}$/.test(document.getElementById('f4').value.trim())){toast('❌ Mobile: 10 digits!','e');return false;}
+function clF(){
+    var ids=['i1','i2','i3','i4','i5','i6','i7','i8','i9'];
+    for(var x=0;x<ids.length;x++)document.getElementById(ids[x]).value='';
+    document.getElementById('i10').value='Active';
+}
+
+function vld(){
+    var r=[{i:'i1',n:'Code'},{i:'i2',n:'Name'},{i:'i3',n:'Aadhar'},{i:'i4',n:'Mobile'},{i:'i5',n:'Address'},{i:'i6',n:'Bank'},{i:'i7',n:'A/C'},{i:'i8',n:'IFSC'}];
+    for(var x=0;x<r.length;x++){
+        if(!document.getElementById(r[x].i).value.trim()){toast('❌ '+r[x].n+' required!','e');document.getElementById(r[x].i).focus();return false;}
+    }
+    if(document.getElementById('i3').value.replace(/\D/g,'').length!==12){toast('❌ Aadhar:12 digits!','e');return false;}
+    if(!/^\d{10}$/.test(document.getElementById('i4').value.trim())){toast('❌ Mobile:10 digits!','e');return false;}
     return true;
 }
 
-// ================================================================
-// 💾 SAVE FARMER - Firebase + Local BOTH
-// ================================================================
-async function saveF(){
-    if(!valF())return;
-
-    const d = {
-        c:document.getElementById('f1').value.trim(),
-        n:document.getElementById('f2').value.trim(),
-        a:document.getElementById('f3').value.trim(),
-        m:document.getElementById('f4').value.trim(),
-        ad:document.getElementById('f5').value.trim(),
-        b:document.getElementById('f6').value.trim(),
-        ac:document.getElementById('f7').value.trim(),
-        if:document.getElementById('f8').value.trim().toUpperCase(),
-        br:document.getElementById('f9').value.trim(),
-        s:document.getElementById('f10').value,
-        du:new Date().toISOString()
-    };
-
-    const editKey = document.getElementById('eIdx').value;
-
-    if(editKey){
-        // EDIT MODE
-        const idx = FD.findIndex((f,i) => FKEYS[i] === editKey);
-        d.da = (idx >= 0 && FD[idx]) ? (FD[idx].da || d.du) : d.du;
-
-        // Save to Firebase (update existing)
-        const saved = await saveToFirebase(d, editKey);
-
-        if(!saved){
-            // Offline fallback
-            if(idx >= 0) FD[idx] = d;
-            localStorage.setItem('FD_'+CU.mobile, JSON.stringify(FD));
-            render();
-        }
-
-        toast('✅ Updated!' + (saved ? ' ☁️' : ' 💾'),'s');
-
-    } else {
-        // ADD MODE
-        if(FD.find(f=>f.c===d.c)){toast('❌ Code exists!','e');return;}
-        d.da = d.du;
-
-        // Save to Firebase (push new)
-        const saved = await saveToFirebase(d, null);
-
-        if(!saved){
-            // Offline fallback
-            FD.push(d);
-            localStorage.setItem('FD_'+CU.mobile, JSON.stringify(FD));
-            render();
-        }
-
-        toast('✅ Added!' + (saved ? ' ☁️' : ' 💾'),'s');
-    }
-
-    cFm();
+function vwF(i){
+    var f=FD[i];if(!f)return;
+    var bc=f.s==='Active'?'bd-a':f.s==='Inactive'?'bd-i':'bd-p';
+    document.getElementById('vCt').innerHTML=
+        vI('Code',f.c)+vI('Name',f.n)+vI('Aadhar',f.a)+vI('Mobile','📞 '+f.m)+
+        vI('Address',f.ad,1)+vI('Bank','🏦 '+f.b)+vI('A/C',f.ac)+
+        vI('IFSC','<code>'+f.if+'</code>')+vI('Branch',f.br||'N/A')+
+        vI('Status','<span class="bd '+bc+'">'+f.s+'</span>')+
+        vI('Added',f.cr?new Date(f.cr).toLocaleString('en-IN'):'N/A')+
+        vI('Updated',f.u?new Date(f.u).toLocaleString('en-IN'):'N/A');
+    document.getElementById('vMd').classList.add('op');
 }
+function vI(l,v,fw){return '<div class="vi'+(fw?' fw':'')+'"><div class="vl">'+l+'</div><div class="vv">'+(v||'N/A')+'</div></div>';}
 
-// VIEW
-function viewF(i){
-    const f=FD[i];if(!f)return;
-    const bc=f.s==='Active'?'g1':f.s==='Inactive'?'g2':'g3';
-    document.getElementById('vCt').innerHTML=`<div class="vx"><label>Code</label><p>${f.c}</p></div><div class="vx"><label>Name</label><p>${f.n}</p></div><div class="vx"><label>Aadhar</label><p>${f.a}</p></div><div class="vx"><label>Mobile</label><p>📞${f.m}</p></div><div class="vx fw"><label>Address</label><p>${f.ad}</p></div><div class="vx"><label>Bank</label><p>🏦${f.b}</p></div><div class="vx"><label>A/C</label><p>${f.ac}</p></div><div class="vx"><label>IFSC</label><p><code>${f.if}</code></p></div><div class="vx"><label>Branch</label><p>${f.br||'N/A'}</p></div><div class="vx"><label>Status</label><p><span class="bdg ${bc}">${f.s}</span></p></div><div class="vx"><label>Added</label><p>${f.da||'N/A'}</p></div><div class="vx"><label>Updated</label><p>${f.du||'N/A'}</p></div>`;
-    document.getElementById('vOv').classList.add('on');
-}
-
-// EDIT
-function editF(i){
-    const f=FD[i];if(!f)return;
-    document.getElementById('mTi').textContent='✏️ Edit';
-    document.getElementById('eIdx').value=FKEYS[i]||('local_'+i);
-    document.getElementById('f1').value=f.c||'';
-    document.getElementById('f2').value=f.n||'';
-    document.getElementById('f3').value=f.a||'';
-    document.getElementById('f4').value=f.m||'';
-    document.getElementById('f5').value=f.ad||'';
-    document.getElementById('f6').value=f.b||'';
-    document.getElementById('f7').value=f.ac||'';
-    document.getElementById('f8').value=f.if||'';
-    document.getElementById('f9').value=f.br||'';
-    document.getElementById('f10').value=f.s||'Active';
-    document.getElementById('fOv').classList.add('on');
-}
-
-// DELETE
-async function delF(i){
-    if(!confirm('⚠️ Delete "'+FD[i].n+'" ('+FD[i].c+')?\n\n💡 Tip: Pehle Backup le lo!'))return;
-
-    const firebaseKey = FKEYS[i];
-
-    if(firebaseKey && db && isOnline){
-        await deleteFromFirebase(firebaseKey);
-        // Firebase listener auto update karega
-        toast('🗑️ Deleted from cloud!','s');
-    } else {
-        FD.splice(i,1);
-        localStorage.setItem('FD_'+CU.mobile, JSON.stringify(FD));
-        render();
-        toast('🗑️ Deleted (local)!','s');
-    }
+function edF(i){
+    var f=FD[i];if(!f)return;
+    document.getElementById('mTl').textContent='✏️ Edit';
+    document.getElementById('eK').value=FK[i]||'local_'+i;
+    document.getElementById('i1').value=f.c||'';
+    document.getElementById('i2').value=f.n||'';
+    document.getElementById('i3').value=f.a||'';
+    document.getElementById('i4').value=f.m||'';
+    document.getElementById('i5').value=f.ad||'';
+    document.getElementById('i6').value=f.b||'';
+    document.getElementById('i7').value=f.ac||'';
+    document.getElementById('i8').value=f.if||'';
+    document.getElementById('i9').value=f.br||'';
+    document.getElementById('i10').value=f.s||'Active';
+    document.getElementById('fMd').classList.add('op');
 }
 
 // ================================================================
@@ -666,157 +713,100 @@ async function delF(i){
 // ================================================================
 function expCSV(){
     if(!FD.length){toast('❌ No data!','e');return;}
-    const h=['S.No','Code','Name','Aadhar','Address','Bank','A/C','IFSC','Branch','Mobile','Status','Added','Updated'];
-    let csv='\uFEFF'+h.join(',')+'\n';
-    FD.forEach((f,i)=>{csv+=[i+1,q(f.c),q(f.n),q(f.a),q(f.ad),q(f.b),q(f.ac),q(f.if),q(f.br),q(f.m),q(f.s),q(f.da),q(f.du)].join(',')+'\n';});
-    dlFile(csv,'Farmers_'+CU.name+'_'+gDt()+'.csv','text/csv;charset=utf-8');
-    toast('📗 Excel exported!','s');
+    var h=['S.No','Code','Name','Aadhar','Address','Bank','A/C','IFSC','Branch','Mobile','Status','Created','Updated'];
+    var csv='\uFEFF'+h.join(',')+'\n';
+    for(var x=0;x<FD.length;x++){
+        var f=FD[x];
+        csv+=[x+1,q(f.c),q(f.n),q(f.a),q(f.ad),q(f.b),q(f.ac),q(f.if),q(f.br),q(f.m),q(f.s),q(f.cr),q(f.u)].join(',')+'\n';
+    }
+    dlF(csv,'Farmers_'+CU.name+'_'+gD()+'.csv','text/csv');
+    toast('📗 Excel downloaded!','s');
 }
 
 function bkp(){
     if(!FD.length){toast('❌ No data!','e');return;}
-    dlFile(JSON.stringify({user:CU.name,mobile:CU.mobile,date:new Date().toLocaleString('en-IN'),count:FD.length,data:FD},null,2),'Backup_'+CU.name+'_'+gDt()+'.json','application/json');
+    dlF(JSON.stringify({user:CU.name,mobile:CU.mobile,date:new Date().toLocaleString('en-IN'),count:FD.length,data:FD},null,2),'Backup_'+CU.name+'_'+gD()+'.json','application/json');
     toast('💾 Backup saved!','s');
 }
 
 function rst(){
-    const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+    var inp=document.createElement('input');inp.type='file';inp.accept='.json';
     inp.onchange=async function(e){
-        const file=e.target.files[0];if(!file)return;
-        const reader=new FileReader();
+        var file=e.target.files[0];if(!file)return;
+        var reader=new FileReader();
         reader.onload=async function(ev){
             try{
-                const d=JSON.parse(ev.target.result);
-                if(d.data&&Array.isArray(d.data)){
-                    if(!confirm('⚠️ Add '+d.data.length+' farmers from backup?\n\n(Existing data SAFE rahega - sirf add hoga)'))return;
+                var d=JSON.parse(ev.target.result);
+                var arr=d.data||d.farmers||(Array.isArray(d)?d:null);
+                if(!arr){toast('❌ Invalid file!','e');return;}
 
-                    let added=0;
-                    for(const farmer of d.data){
-                        // DUPLICATE CHECK - sirf naye add karo
-                        if(!FD.find(f=>f.c===farmer.c)){
-                            const saved = await saveToFirebase(farmer, null);
-                            if(!saved){
-                                FD.push(farmer);
-                            }
-                            added++;
+                // ONLY ADD NEW ones - never overwrite
+                var added=0;
+                for(var x=0;x<arr.length;x++){
+                    var f=arr[x];
+                    var exists=FD.find(function(ex){return ex.c===f.c;});
+                    if(!exists){
+                        if(db&&cloud){
+                            await db.ref('farmers/'+CU.mobile).push(f);
+                        }else{
+                            FD.push(f);
                         }
+                        added++;
                     }
-
-                    if(!db||!isOnline){
-                        localStorage.setItem('FD_'+CU.mobile,JSON.stringify(FD));
-                        render();
-                    }
-
-                    toast('✅ '+added+' new farmers added!','s');
                 }
+                if(!db||!cloud){
+                    localStorage.setItem('FD_'+CU.mobile,JSON.stringify(FD));
+                    render();
+                }
+                toast('✅ '+added+' new farmers added!','s');
             }catch(er){toast('❌ Error!','e');}
         };reader.readAsText(file);
     };inp.click();
 }
 
-function q(v){return '"'+String(v||'').replace(/"/g,'""')+'"';}
-function gDt(){return new Date().toISOString().slice(0,10);}
-function dlFile(c,n,t){const b=new Blob([c],{type:t}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);}
-
 // ================================================================
 // LOGOUT
 // ================================================================
 function doOut(){
-    if(!confirm('🚪 Logout?\n\n✅ Data cloud mein safe hai!'))return;
-
-    // Save local backup before logout
-    if(CU && FD.length > 0){
-        localStorage.setItem('FD_'+CU.mobile, JSON.stringify(FD));
-    }
-
-    // Detach Firebase listener
-    if(farmerRef) farmerRef.off();
-
-    localStorage.removeItem('SESSION');
-    CU=null; FD=[]; FKEYS={};
-    showLogin();
+    if(!confirm('🚪 Logout?\n✅ Data cloud mein safe hai!'))return;
+    if(CU&&FD.length>0)localStorage.setItem('FD_'+CU.mobile,JSON.stringify(FD));
+    if(fRef)fRef.off(); // Detach listener
+    localStorage.removeItem('SESS');
+    CU=null;FD=[];FK={};fRef=null;
+    goLogin();
 }
 
 // ================================================================
 // FORGOT PASSWORD
 // ================================================================
-async function forgotP(){
-    const mob=prompt('Registered mobile number:');
-    if(!mob||mob.length!==10){alert('❌ 10-digit mobile!');return;}
+async function fp(){
+    var mb=prompt('Registered mobile:');
+    if(!mb||mb.length!==10){alert('❌ 10-digit mobile!');return;}
 
-    let found=false;
-
-    if(db&&isOnline){
-        const snap=await db.ref('users/'+mob).once('value');
-        if(snap.exists())found=true;
+    var found=false;
+    if(db&&cloud){
+        var sn=await db.ref('users/'+mb).once('value');
+        found=sn.exists();
     }
-    if(!found){
-        const lu=JSON.parse(localStorage.getItem('USERS')||'{}');
-        if(lu[mob])found=true;
-    }
+    if(!found){var lu=JSON.parse(localStorage.getItem('USRS')||'{}');found=!!lu[mb];}
     if(!found){alert('❌ Not registered!');return;}
 
-    const np=prompt('New password (min 4):');
+    var np=prompt('New password (min 4):');
     if(!np||np.length<4){alert('❌ Min 4 chars!');return;}
 
-    if(db&&isOnline) await db.ref('users/'+mob+'/password').set(btoa(np));
-    const lu=JSON.parse(localStorage.getItem('USERS')||'{}');
-    if(lu[mob]){lu[mob].password=btoa(np);localStorage.setItem('USERS',JSON.stringify(lu));}
+    if(db&&cloud)await db.ref('users/'+mb+'/pass').set(btoa(np));
+    var lu2=JSON.parse(localStorage.getItem('USRS')||'{}');
+    if(lu2[mb]){lu2[mb].pass=btoa(np);localStorage.setItem('USRS',JSON.stringify(lu2));}
     alert('✅ Password reset!');
 }
 
 // ================================================================
 // HELPERS
 // ================================================================
-function swT(t){
-    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
-    document.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));
-    hMsg();
-    if(t==='login'){document.querySelectorAll('.tab')[0].classList.add('on');document.getElementById('loginF').classList.add('on');}
-    else{document.querySelectorAll('.tab')[1].classList.add('on');document.getElementById('regF').classList.add('on');}
-}
-function tP(id,el){const i=document.getElementById(id);if(i.type==='password'){i.type='text';el.textContent='🙈';}else{i.type='password';el.textContent='👁️';}}
-function sMsg(t,tp){const m=document.getElementById('aMsg');m.textContent=t;m.className='msg show msg-'+tp;setTimeout(hMsg,5000);}
-function hMsg(){const m=document.getElementById('aMsg');if(m)m.className='msg';}
-function rBtn2(b,t){b.innerHTML=t;b.classList.remove('bld');}
-function toast(m,t){const e=document.createElement('div');e.className='toast t-'+t;e.textContent=m;document.body.appendChild(e);setTimeout(()=>e.remove(),3000);}
-
-// Modal close
-document.addEventListener('click',function(e){
-    if(e.target.id==='fOv')cFm();
-    if(e.target.id==='vOv')cVm();
-});
-document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){cFm();cVm();}
-    if(e.key==='Enter'){
-        const lp=document.getElementById('loginPage');
-        if(lp&&lp.style.display!=='none'){
-            if(document.getElementById('loginF').classList.contains('on'))doLogin();
-            else doReg();
-        }
-    }
-});
-
-// ================================================================
-// 🚀 INIT - APP START
-// ================================================================
-function startApp(){
-    initFirebase();
-
-    // Check existing session
-    try{
-        const session = localStorage.getItem('SESSION');
-        if(session){
-            CU = JSON.parse(session);
-            showHome();
-            return;
-        }
-    }catch(e){}
-
-    showLogin();
-}
-
-startApp();
+function q(v){return '"'+String(v||'').replace(/"/g,'""')+'"';}
+function gD(){return new Date().toISOString().slice(0,10);}
+function dlF(c,n,t){var b=new Blob([c],{type:t}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);}
+function toast(m,t){var e=document.createElement('div');e.className='toast t-'+t;e.textContent=m;document.body.appendChild(e);setTimeout(function(){if(e.parentNode)e.parentNode.removeChild(e);},3000);}
 </script>
 </body>
 </html>
