@@ -3,809 +3,820 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌾 Farmer Database - Online System</title>
+    <title>🌾 Farmer Database</title>
 
-    <!-- Firebase CDN - Free Online Database -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Tahoma,sans-serif; }
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif}
+        body{background:linear-gradient(135deg,#0a3d1f,#14694a,#1e8a5a);min-height:100vh}
 
-        body {
-            background: linear-gradient(135deg, #0a3d1f, #14694a, #1e8a5a);
-            min-height: 100vh; padding: 12px;
-        }
+        /* LOGIN */
+        #loginPage{display:flex;justify-content:center;align-items:center;min-height:100vh;padding:15px}
+        #homePage{display:none;padding:10px}
+        .lbox{width:100%;max-width:420px}
+        .logo{text-align:center;margin-bottom:22px}
+        .logo span{font-size:3.5rem;display:block;animation:bounce 2s infinite}
+        @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+        .logo h1{color:white;font-size:1.6rem;text-shadow:2px 2px 4px rgba(0,0,0,0.3)}
+        .logo p{color:#a8e6cf;font-size:0.82rem;margin-top:4px}
+        .crd{background:white;border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,0.3);overflow:hidden;animation:sUp .4s ease}
+        @keyframes sUp{from{transform:translateY(35px);opacity:0}to{transform:translateY(0);opacity:1}}
+        .ch{background:linear-gradient(135deg,#1a5c34,#2d8b5e);padding:16px 20px;text-align:center}
+        .ch h2{color:white;font-size:1.15rem}.ch p{color:#a8e6cf;font-size:.75rem;margin-top:3px}
+        .conn{text-align:center;padding:7px;font-size:.72rem;font-weight:600}
+        .c-on{background:#e8f5e9;color:#2e7d32}.c-off{background:#ffebee;color:#c62828}.c-wait{background:#fff3e0;color:#e65100}
+        .tabs{display:flex;background:#f5f5f5}
+        .tab{flex:1;padding:12px;text-align:center;cursor:pointer;font-weight:600;font-size:.85rem;color:#888;border-bottom:3px solid transparent;transition:.3s}
+        .tab:hover{color:#333}.tab.on{color:#4CAF50;border-bottom-color:#4CAF50;background:white}
+        .fa{padding:20px}
+        .fb{display:none}.fb.on{display:block}
+        .ig{margin-bottom:14px}
+        .ig label{display:block;font-size:.78rem;color:#555;margin-bottom:4px;font-weight:600}
+        .ig .rq{color:#f44336}
+        .iw{position:relative}
+        .iw .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:1rem}
+        .iw input{width:100%;padding:11px 13px 11px 38px;border:2px solid #e0e0e0;border-radius:11px;font-size:.9rem;outline:none;transition:.3s}
+        .iw input:focus{border-color:#4CAF50;box-shadow:0 0 0 3px rgba(76,175,80,.1)}
+        .iw .tp{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1rem;user-select:none}
+        .ig .ht{font-size:.68rem;color:#999;margin-top:3px}
+        .rem{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:.78rem}
+        .rem label{display:flex;align-items:center;gap:4px;cursor:pointer;color:#666}
+        .rem a{color:#4CAF50;text-decoration:none;font-weight:600}
+        .ba2{width:100%;padding:12px;border:none;border-radius:11px;font-size:.92rem;font-weight:700;cursor:pointer;transition:.3s;display:flex;align-items:center;justify-content:center;gap:6px}
+        .ba2:hover{transform:translateY(-2px)}.ba2:active{transform:scale(.98)}
+        .bgr{background:linear-gradient(135deg,#4CAF50,#388E3C);color:white;box-shadow:0 3px 12px rgba(76,175,80,.4)}
+        .bbl{background:linear-gradient(135deg,#2196F3,#1976D2);color:white;box-shadow:0 3px 12px rgba(33,150,243,.4)}
+        .bld{pointer-events:none;opacity:.7}
+        .dv{text-align:center;margin:14px 0;position:relative}
+        .dv::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:#e0e0e0}
+        .dv span{background:white;padding:0 12px;position:relative;color:#999;font-size:.78rem}
+        .msg{padding:9px 13px;border-radius:9px;margin-bottom:12px;font-size:.8rem;font-weight:600;display:none;animation:fIn .3s}
+        @keyframes fIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+        .msg.show{display:block}.msg-e{background:#ffebee;color:#c62828;border:1px solid #ef9a9a}.msg-s{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+        .cft{text-align:center;padding:10px;background:#f8f9fa;font-size:.72rem;color:#888}
+        .spn{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top:2px solid white;border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+        @keyframes spin{to{transform:rotate(360deg)}}
 
-        /* ===== HEADER ===== */
-        .header {
-            text-align:center; padding:18px;
-            background:rgba(255,255,255,0.12); border-radius:15px;
-            margin-bottom:12px; backdrop-filter:blur(10px);
-        }
-        .header h1 { color:#fff; font-size:1.7rem; }
-        .header p { color:#a8e6cf; font-size:0.85rem; margin-top:5px; }
-        .mode-badge {
-            display:inline-block; padding:5px 18px; border-radius:20px;
-            font-size:0.75rem; margin-top:8px; font-weight:700;
-        }
-        .mode-online { background:#4CAF50; color:white; }
-        .mode-offline { background:#FF9800; color:white; }
-        .mode-error { background:#f44336; color:white; }
-
-        /* ===== SYNC BAR ===== */
-        .sync-bar {
-            background: linear-gradient(135deg, #1565C0, #0D47A1);
-            color:white; padding:10px 18px; border-radius:10px;
-            margin-bottom:12px; display:flex; justify-content:space-between;
-            align-items:center; font-size:0.82rem; flex-wrap:wrap; gap:8px;
-        }
-        .sync-bar .dot {
-            width:9px; height:9px; border-radius:50%;
-            display:inline-block; margin-right:7px;
-        }
-        .dot-green { background:#4CAF50; animation:pulse 1.5s infinite; }
-        .dot-red { background:#f44336; }
-        .dot-yellow { background:#FF9800; animation:pulse 1s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.3;} }
-
-        .share-link {
-            background:rgba(255,255,255,0.15); padding:6px 14px;
-            border-radius:20px; cursor:pointer; transition:all 0.3s;
-        }
-        .share-link:hover { background:rgba(255,255,255,0.3); }
-
-        /* ===== STATS ===== */
-        .stats { display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
-        .sc {
-            flex:1; min-width:130px; background:rgba(255,255,255,0.95);
-            border-radius:12px; padding:16px; text-align:center;
-            box-shadow:0 3px 12px rgba(0,0,0,0.1); transition:transform 0.3s;
-        }
-        .sc:hover { transform:translateY(-3px); }
-        .sc .n { font-size:1.7rem; font-weight:bold; color:#0a3d1f; }
-        .sc .l { color:#666; font-size:0.75rem; margin-top:3px; }
-        .sc.c1 { border-top:3px solid #2196F3; }
-        .sc.c2 { border-top:3px solid #4CAF50; }
-        .sc.c3 { border-top:3px solid #f44336; }
-        .sc.c4 { border-top:3px solid #FF9800; }
-
-        /* ===== CONTROLS ===== */
-        .ctrls {
-            display:flex; justify-content:space-between; align-items:center;
-            margin-bottom:12px; flex-wrap:wrap; gap:8px;
-        }
-        .sbox { display:flex; gap:7px; flex-wrap:wrap; }
-        .sbox input, .sbox select {
-            padding:10px 15px; border:2px solid #ddd; border-radius:22px;
-            font-size:0.88rem; outline:none; background:white;
-        }
-        .sbox input:focus, .sbox select:focus { border-color:#4CAF50; }
-        .bgrp { display:flex; gap:7px; flex-wrap:wrap; }
-
-        /* ===== BUTTONS ===== */
-        .btn {
-            padding:10px 20px; border:none; border-radius:22px;
-            font-size:0.85rem; cursor:pointer; font-weight:600;
-            display:inline-flex; align-items:center; gap:6px;
-            transition:all 0.3s; white-space:nowrap;
-        }
-        .btn:hover { transform:translateY(-2px); }
-        .btn:active { transform:scale(0.96); }
-        .ba { background:linear-gradient(135deg,#4CAF50,#388E3C); color:white; box-shadow:0 3px 12px rgba(76,175,80,0.4); }
-        .be { background:linear-gradient(135deg,#217346,#185C37); color:white; }
-        .bb { background:linear-gradient(135deg,#FF9800,#F57C00); color:white; }
-        .bd { background:linear-gradient(135deg,#9C27B0,#7B1FA2); color:white; }
-        .bp { background:linear-gradient(135deg,#607D8B,#455A64); color:white; }
-        .bshare { background:linear-gradient(135deg,#E91E63,#C2185B); color:white; }
-        .sm { padding:5px 11px; font-size:0.72rem; border-radius:14px; }
-        .sv { background:#2196F3; color:white; }
-        .sed { background:#FF9800; color:white; }
-        .sdl { background:#f44336; color:white; }
-        .scancel { background:#e0e0e0; color:#555; }
-        .ssave { background:linear-gradient(135deg,#4CAF50,#388E3C); color:white; }
-
-        /* ===== TABLE ===== */
-        .tbox {
-            background:white; border-radius:14px; overflow:hidden;
-            box-shadow:0 8px 35px rgba(0,0,0,0.2);
-        }
-        .twrap { overflow-x:auto; }
-        table { width:100%; border-collapse:collapse; min-width:1200px; }
-        thead { background:linear-gradient(135deg,#0a3d1f,#1e8a5a); }
-        thead th {
-            padding:13px 9px; color:white; text-align:left;
-            font-size:0.73rem; text-transform:uppercase; letter-spacing:0.4px;
-            white-space:nowrap;
-        }
-        tbody tr { border-bottom:1px solid #f0f0f0; transition:background 0.2s; }
-        tbody tr:hover { background:#eeffee; }
-        tbody tr:nth-child(even) { background:#fafafa; }
-        tbody tr:nth-child(even):hover { background:#e8ffe8; }
-        tbody td { padding:10px 9px; font-size:0.82rem; color:#333; white-space:nowrap; }
-
-        .badge {
-            padding:3px 13px; border-radius:18px; font-size:0.7rem;
-            font-weight:600; text-transform:uppercase;
-        }
-        .ba1 { background:#e8f5e9; color:#2e7d32; }
-        .ba2 { background:#ffebee; color:#c62828; }
-        .ba3 { background:#fff3e0; color:#e65100; }
-        .acts { display:flex; gap:3px; }
-
-        /* ===== PAGINATION ===== */
-        .pg { display:flex; justify-content:center; padding:15px; gap:4px; flex-wrap:wrap; }
-        .pg button {
-            padding:6px 12px; border:2px solid #e0e0e0; background:white;
-            border-radius:7px; cursor:pointer; font-weight:600; font-size:0.8rem;
-        }
-        .pg button:hover, .pg button.act { background:#4CAF50; color:white; border-color:#4CAF50; }
-        .pg button:disabled { opacity:0.4; cursor:not-allowed; }
-
-        .nodata { text-align:center; padding:40px; color:#999; }
-        .nodata span { font-size:2.5rem; display:block; margin-bottom:8px; }
-
-        /* ===== MODAL ===== */
-        .ov {
-            display:none; position:fixed; top:0; left:0; width:100%; height:100%;
-            background:rgba(0,0,0,0.6); z-index:1000; justify-content:center;
-            align-items:center; backdrop-filter:blur(4px);
-        }
-        .ov.on { display:flex; }
-        .mdl {
-            background:white; border-radius:18px; width:92%; max-width:720px;
-            max-height:90vh; overflow-y:auto; box-shadow:0 18px 50px rgba(0,0,0,0.3);
-            animation:mIn 0.25s ease;
-        }
-        @keyframes mIn { from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;} }
-        .mhd {
-            background:linear-gradient(135deg,#0a3d1f,#1e8a5a); color:white;
-            padding:16px 20px; display:flex; justify-content:space-between;
-            align-items:center; border-radius:18px 18px 0 0;
-        }
-        .mhd h2 { font-size:1.15rem; }
-        .cbtn {
-            background:rgba(255,255,255,0.2); border:none; color:white;
-            font-size:1.3rem; cursor:pointer; width:30px; height:30px;
-            border-radius:50%; display:flex; align-items:center; justify-content:center;
-        }
-        .cbtn:hover { background:rgba(255,255,255,0.4); }
-        .mbd { padding:20px; }
-        .mft { padding:10px 20px 20px; display:flex; justify-content:flex-end; gap:8px; }
-
-        /* ===== FORM ===== */
-        .fgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-        .fg { display:flex; flex-direction:column; }
-        .fg.fw { grid-column:1/-1; }
-        .fg label { font-size:0.8rem; color:#555; margin-bottom:4px; font-weight:600; }
-        .fg .rq { color:#f44336; }
-        .fg input, .fg select, .fg textarea {
-            padding:10px 13px; border:2px solid #e0e0e0; border-radius:9px;
-            font-size:0.9rem; outline:none; transition:all 0.3s;
-        }
-        .fg input:focus, .fg select:focus, .fg textarea:focus {
-            border-color:#4CAF50; box-shadow:0 0 0 3px rgba(76,175,80,0.1);
-        }
-        .fg textarea { resize:vertical; min-height:60px; }
-
-        /* ===== VIEW ===== */
-        .vgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-        .vi {
-            padding:11px; background:#f8f9fa; border-radius:9px;
-            border-left:3px solid #4CAF50;
-        }
-        .vi.fw { grid-column:1/-1; }
-        .vi label { font-size:0.7rem; color:#888; text-transform:uppercase; letter-spacing:0.4px; }
-        .vi p { font-size:0.9rem; color:#333; font-weight:600; margin-top:2px; word-break:break-all; }
-
-        /* ===== LOADING ===== */
-        .loading-overlay {
-            position:fixed; top:0; left:0; width:100%; height:100%;
-            background:rgba(0,0,0,0.7); z-index:2000; display:flex;
-            justify-content:center; align-items:center; flex-direction:column;
-        }
-        .loading-overlay.hidden { display:none; }
-        .spinner {
-            width:50px; height:50px; border:4px solid rgba(255,255,255,0.3);
-            border-top:4px solid #4CAF50; border-radius:50%;
-            animation:spin 0.8s linear infinite;
-        }
-        @keyframes spin { to{transform:rotate(360deg);} }
-        .loading-overlay p { color:white; margin-top:15px; font-size:1rem; }
-
-        /* ===== TOAST ===== */
-        .toast {
-            position:fixed; top:15px; right:15px; padding:13px 20px;
-            border-radius:10px; color:white; font-weight:600; z-index:3000;
-            animation:tIn 0.3s ease; box-shadow:0 4px 12px rgba(0,0,0,0.2);
-            max-width:350px; font-size:0.85rem;
-        }
-        .ts { background:#4CAF50; }
-        .te { background:#f44336; }
-        .tw { background:#2196F3; }
-        @keyframes tIn { from{transform:translateX(100px);opacity:0;}to{transform:translateX(0);opacity:1;} }
-
-        /* ===== RESPONSIVE ===== */
-        @media(max-width:768px) {
-            .header h1 { font-size:1.2rem; }
-            .fgrid,.vgrid { grid-template-columns:1fr; }
-            .stats { flex-direction:column; }
-            .ctrls { flex-direction:column; align-items:stretch; }
-            .sbox,.bgrp { flex-direction:column; }
-        }
-
-        @media print {
-            body { background:white; padding:5px; }
-            .header,.ctrls,.acts,.pg,.bgrp,.sync-bar,.stats,.btn { display:none !important; }
-            .tbox { box-shadow:none; }
-        }
+        /* HOME */
+        .tb2{background:rgba(255,255,255,.12);border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(10px);flex-wrap:wrap;gap:6px}
+        .tb2 h1{color:#fff;font-size:1.15rem}.tb2 p{color:#a8e6cf;font-size:.68rem}
+        .tr2{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+        .ui2{background:rgba(255,255,255,.15);padding:5px 12px;border-radius:20px;color:white;font-size:.75rem;cursor:pointer}
+        .ui2 strong{color:#a8e6cf}
+        .sb2{padding:4px 12px;border-radius:15px;font-size:.66rem;font-weight:700}
+        .sb-on{background:#4CAF50;color:white}.sb-off{background:#FF9800;color:white}
+        .bo2{padding:5px 12px;border:1.5px solid rgba(255,255,255,.3);background:transparent;color:white;border-radius:20px;cursor:pointer;font-weight:600;font-size:.75rem}
+        .bo2:hover{background:rgba(255,255,255,.2)}
+        .sts{display:flex;gap:7px;margin-bottom:8px;flex-wrap:wrap}
+        .sc{flex:1;min-width:100px;background:rgba(255,255,255,.95);border-radius:10px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .sc .n{font-size:1.3rem;font-weight:bold;color:#0a3d1f}.sc .l{color:#666;font-size:.65rem;margin-top:2px}
+        .sc.c1{border-top:3px solid #2196F3}.sc.c2{border-top:3px solid #4CAF50}.sc.c3{border-top:3px solid #f44336}.sc.c4{border-top:3px solid #FF9800}
+        .ct{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px}
+        .sb{display:flex;gap:5px;flex-wrap:wrap}
+        .sb input,.sb select{padding:8px 12px;border:2px solid #ddd;border-radius:20px;font-size:.8rem;outline:none;background:white}
+        .sb input:focus,.sb select:focus{border-color:#4CAF50}
+        .bg3{display:flex;gap:5px;flex-wrap:wrap}
+        .btn{padding:8px 15px;border:none;border-radius:20px;font-size:.76rem;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:4px;transition:.3s;white-space:nowrap}
+        .btn:hover{transform:translateY(-1px)}
+        .b-a{background:linear-gradient(135deg,#4CAF50,#388E3C);color:white}.b-e{background:linear-gradient(135deg,#217346,#185C37);color:white}
+        .b-b{background:linear-gradient(135deg,#FF9800,#F57C00);color:white}.b-r{background:linear-gradient(135deg,#9C27B0,#7B1FA2);color:white}
+        .b-p{background:linear-gradient(135deg,#607D8B,#455A64);color:white}
+        .sm{padding:3px 8px;font-size:.66rem;border-radius:12px}
+        .sv2{background:#2196F3;color:white}.se2{background:#FF9800;color:white}.sd2{background:#f44336;color:white}
+        .sc2{background:#e0e0e0;color:#555}.ss2{background:linear-gradient(135deg,#4CAF50,#388E3C);color:white}
+        .tbx{background:white;border-radius:12px;overflow:hidden;box-shadow:0 6px 22px rgba(0,0,0,.2)}
+        .tw{overflow-x:auto}
+        table{width:100%;border-collapse:collapse;min-width:1100px}
+        thead{background:linear-gradient(135deg,#0a3d1f,#1e8a5a)}
+        thead th{padding:11px 7px;color:white;text-align:left;font-size:.66rem;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+        tbody tr{border-bottom:1px solid #f0f0f0;transition:background .15s}
+        tbody tr:hover{background:#eeffee}tbody tr:nth-child(even){background:#fafafa}
+        tbody td{padding:8px 7px;font-size:.76rem;color:#333;white-space:nowrap}
+        .bdg{padding:2px 10px;border-radius:14px;font-size:.62rem;font-weight:600;text-transform:uppercase}
+        .g1{background:#e8f5e9;color:#2e7d32}.g2{background:#ffebee;color:#c62828}.g3{background:#fff3e0;color:#e65100}
+        .acts{display:flex;gap:2px}
+        .pag{display:flex;justify-content:center;padding:12px;gap:3px;flex-wrap:wrap}
+        .pag button{padding:5px 10px;border:1.5px solid #e0e0e0;background:white;border-radius:6px;cursor:pointer;font-weight:600;font-size:.72rem}
+        .pag button:hover,.pag button.act{background:#4CAF50;color:white;border-color:#4CAF50}
+        .pag button:disabled{opacity:.4;cursor:not-allowed}
+        .nd{text-align:center;padding:30px;color:#999}.nd span{font-size:2rem;display:block;margin-bottom:6px}
+        .ov{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:1000;justify-content:center;align-items:center;backdrop-filter:blur(3px)}
+        .ov.on{display:flex}
+        .ml{background:white;border-radius:16px;width:92%;max-width:660px;max-height:90vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.3);animation:mU .2s ease}
+        @keyframes mU{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+        .mh{background:linear-gradient(135deg,#0a3d1f,#1e8a5a);color:white;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;border-radius:16px 16px 0 0}
+        .mh h2{font-size:1rem}
+        .cx{background:rgba(255,255,255,.2);border:none;color:white;font-size:1.1rem;cursor:pointer;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+        .cx:hover{background:rgba(255,255,255,.4)}
+        .mb{padding:16px}.mf{padding:8px 16px 16px;display:flex;justify-content:flex-end;gap:6px}
+        .fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+        .fi{display:flex;flex-direction:column}.fi.fw{grid-column:1/-1}
+        .fi label{font-size:.72rem;color:#555;margin-bottom:3px;font-weight:600}.fi .rq{color:#f44336}
+        .fi input,.fi select,.fi textarea{padding:8px 10px;border:2px solid #e0e0e0;border-radius:8px;font-size:.84rem;outline:none;transition:.3s}
+        .fi input:focus,.fi select:focus,.fi textarea:focus{border-color:#4CAF50;box-shadow:0 0 0 3px rgba(76,175,80,.08)}
+        .fi textarea{resize:vertical;min-height:48px}
+        .vg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+        .vx{padding:9px;background:#f8f9fa;border-radius:8px;border-left:3px solid #4CAF50}
+        .vx.fw{grid-column:1/-1}
+        .vx label{font-size:.62rem;color:#888;text-transform:uppercase;letter-spacing:.3px}
+        .vx p{font-size:.82rem;color:#333;font-weight:600;margin-top:2px;word-break:break-all}
+        .toast{position:fixed;top:10px;right:10px;padding:10px 16px;border-radius:8px;color:white;font-weight:600;z-index:3000;animation:tI .3s ease;box-shadow:0 3px 10px rgba(0,0,0,.2);max-width:300px;font-size:.78rem}
+        .t-s{background:#4CAF50}.t-e{background:#f44336}.t-w{background:#FF9800}
+        @keyframes tI{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
+        @media(max-width:768px){.tb2{flex-direction:column;text-align:center}.fg,.vg{grid-template-columns:1fr}.sts{flex-direction:column}.ct{flex-direction:column;align-items:stretch}.sb,.bg3{flex-direction:column}.tr2{justify-content:center}}
+        @media print{body{background:white}#loginPage,.tb2,.ct,.acts,.pag,.bg3,.sts,.btn,.sb2{display:none!important}#homePage{display:block!important}.tbx{box-shadow:none}}
     </style>
 </head>
 <body>
 
-    <!-- LOADING -->
-    <div class="loading-overlay" id="loadingScreen">
-        <div class="spinner"></div>
-        <p>🌾 Loading Farmer Database...</p>
-    </div>
-
-    <!-- HEADER -->
-    <div class="header">
-        <h1>🌾 Farmer Database Management System</h1>
-        <p>किसान डेटाबेस | Online + Offline | Real-time Sync</p>
-        <span class="mode-badge mode-online" id="modeBadge">🔄 Connecting...</span>
-    </div>
-
-    <!-- SYNC BAR -->
-    <div class="sync-bar">
-        <div>
-            <span class="dot dot-yellow" id="syncDot"></span>
-            <strong>💾 Status:</strong> <span id="syncStatus">Connecting to database...</span>
-            | Last Sync: <span id="lastSync">-</span>
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+<div class="lbox">
+    <div class="logo"><span>🌾</span><h1>Farmer Database</h1><p>किसान डेटाबेस | Firebase Cloud Powered</p></div>
+    <div class="crd">
+        <div class="ch"><h2>🔐 Welcome!</h2><p>Login or Register</p></div>
+        <div class="conn c-wait" id="connSt">🔄 Connecting to Firebase...</div>
+        <div class="tabs">
+            <div class="tab on" onclick="swT('login')">🔑 Login</div>
+            <div class="tab" onclick="swT('reg')">📝 Register</div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center;">
-            <span class="share-link" onclick="copyLink()" title="Copy Link">
-                🔗 Share Link
-            </span>
-            <span>Users Online: <strong id="onlineUsers">1</strong></span>
-        </div>
-    </div>
-
-    <!-- STATS -->
-    <div class="stats">
-        <div class="sc c1"><div class="n" id="sTotal">0</div><div class="l">📊 Total</div></div>
-        <div class="sc c2"><div class="n" id="sActive">0</div><div class="l">✅ Active</div></div>
-        <div class="sc c3"><div class="n" id="sInactive">0</div><div class="l">❌ Inactive</div></div>
-        <div class="sc c4"><div class="n" id="sPending">0</div><div class="l">⏳ Pending</div></div>
-    </div>
-
-    <!-- CONTROLS -->
-    <div class="ctrls">
-        <div class="sbox">
-            <input type="text" id="searchInput" placeholder="🔍 Search..." oninput="renderTable()">
-            <select id="filterStatus" onchange="renderTable()">
-                <option value="all">All Status</option>
-                <option value="Active">✅ Active</option>
-                <option value="Inactive">❌ Inactive</option>
-                <option value="Pending">⏳ Pending</option>
-            </select>
-        </div>
-        <div class="bgrp">
-            <button class="btn ba" onclick="openAdd()">➕ Add Farmer</button>
-            <button class="btn be" onclick="exportExcel()">📗 Export Excel</button>
-            <button class="btn bb" onclick="backupJSON()">💾 Backup</button>
-            <button class="btn bshare" onclick="copyLink()">🔗 Share</button>
-            <button class="btn bp" onclick="window.print()">🖨️ Print</button>
-        </div>
-    </div>
-
-    <!-- TABLE -->
-    <div class="tbox">
-        <div class="twrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>S.No.</th><th>Farmer Code</th><th>Farmer Name</th>
-                        <th>Aadhar No.</th><th>Address</th><th>Bank Name</th>
-                        <th>Bank A/C</th><th>IFSC</th><th>Branch</th>
-                        <th>Mobile</th><th>Status</th><th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody"></tbody>
-            </table>
-        </div>
-        <div class="pg" id="paging"></div>
-    </div>
-
-    <!-- ADD/EDIT MODAL -->
-    <div class="ov" id="formModal">
-        <div class="mdl">
-            <div class="mhd">
-                <h2 id="mTitle">➕ Add Farmer</h2>
-                <button class="cbtn" onclick="closeForm()">&times;</button>
+        <div class="fa">
+            <div class="msg" id="aMsg"></div>
+            <div class="fb on" id="loginF">
+                <div class="ig"><label>📱 Mobile <span class="rq">*</span></label><div class="iw"><span class="ic">📱</span><input type="tel" id="lM" placeholder="10-digit" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')"></div></div>
+                <div class="ig"><label>🔒 Password <span class="rq">*</span></label><div class="iw"><span class="ic">🔒</span><input type="password" id="lP" placeholder="Password"><span class="tp" onclick="tP('lP',this)">👁️</span></div></div>
+                <div class="rem"><label><input type="checkbox" id="remMe" checked> Remember</label><a href="#" onclick="forgotP();return false">Forgot?</a></div>
+                <button class="ba2 bgr" onclick="doLogin()" id="lBtn">🔑 Login</button>
+                <div class="dv"><span>New?</span></div>
+                <button class="ba2 bbl" onclick="swT('reg')">📝 Create Account</button>
             </div>
-            <div class="mbd">
-                <input type="hidden" id="editKey" value="">
-                <div class="fgrid">
-                    <div class="fg"><label>Farmer Code <span class="rq">*</span></label><input type="text" id="fCode" placeholder="FR-001"></div>
-                    <div class="fg"><label>Farmer Name <span class="rq">*</span></label><input type="text" id="fName" placeholder="Name"></div>
-                    <div class="fg"><label>Aadhar Number <span class="rq">*</span></label><input type="text" id="fAadhar" placeholder="XXXX-XXXX-XXXX" maxlength="14" oninput="fmtAadhar(this)"></div>
-                    <div class="fg"><label>Mobile <span class="rq">*</span></label><input type="text" id="fMobile" placeholder="10 digits" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')"></div>
-                    <div class="fg fw"><label>Address <span class="rq">*</span></label><textarea id="fAddr" placeholder="Full address"></textarea></div>
-                    <div class="fg"><label>Bank Name <span class="rq">*</span></label><input type="text" id="fBank" placeholder="Bank name"></div>
-                    <div class="fg"><label>Bank A/C <span class="rq">*</span></label><input type="text" id="fAC" placeholder="Account no."></div>
-                    <div class="fg"><label>IFSC Code <span class="rq">*</span></label><input type="text" id="fIFSC" placeholder="SBIN0001234" style="text-transform:uppercase;"></div>
-                    <div class="fg"><label>Branch Address</label><input type="text" id="fBranch" placeholder="Branch"></div>
-                    <div class="fg"><label>Status <span class="rq">*</span></label>
-                        <select id="fStatus">
-                            <option value="Active">✅ Active</option>
-                            <option value="Pending">⏳ Pending</option>
-                            <option value="Inactive">❌ Inactive</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="mft">
-                <button class="btn scancel" onclick="closeForm()">Cancel</button>
-                <button class="btn ssave" onclick="saveFarmer()">💾 Save & Sync</button>
+            <div class="fb" id="regF">
+                <div class="ig"><label>👤 Name <span class="rq">*</span></label><div class="iw"><span class="ic">👤</span><input id="rN" placeholder="Full name"></div></div>
+                <div class="ig"><label>📱 Mobile <span class="rq">*</span></label><div class="iw"><span class="ic">📱</span><input type="tel" id="rM" placeholder="10-digit" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')"></div><div class="ht">📌 Login ID - kahi bhi login karo</div></div>
+                <div class="ig"><label>🔒 Password <span class="rq">*</span></label><div class="iw"><span class="ic">🔒</span><input type="password" id="rP" placeholder="Min 4 chars"><span class="tp" onclick="tP('rP',this)">👁️</span></div></div>
+                <div class="ig"><label>🔒 Confirm <span class="rq">*</span></label><div class="iw"><span class="ic">🔒</span><input type="password" id="rC" placeholder="Re-enter"><span class="tp" onclick="tP('rC',this)">👁️</span></div></div>
+                <button class="ba2 bgr" onclick="doReg()" id="rBtn">📝 Create Account</button>
+                <div class="dv"><span>Have account?</span></div>
+                <button class="ba2 bbl" onclick="swT('login')">🔑 Login</button>
             </div>
         </div>
+        <div class="cft">☁️ Firebase Cloud | Data safe forever | v4.0</div>
     </div>
+</div>
+</div>
 
-    <!-- VIEW MODAL -->
-    <div class="ov" id="viewModal">
-        <div class="mdl">
-            <div class="mhd"><h2>👁️ Farmer Details</h2><button class="cbtn" onclick="closeView()">&times;</button></div>
-            <div class="mbd"><div class="vgrid" id="viewContent"></div></div>
-            <div class="mft"><button class="btn scancel" onclick="closeView()">Close</button></div>
+<!-- HOME PAGE -->
+<div id="homePage">
+    <div class="tb2">
+        <div><h1>🌾 Farmer Database</h1><p id="welc"></p></div>
+        <div class="tr2">
+            <span class="sb2 sb-off" id="syncB">⏳</span>
+            <div class="ui2" id="uDsp">👤</div>
+            <button class="bo2" onclick="doOut()">🚪 Logout</button>
         </div>
     </div>
+    <div class="sts">
+        <div class="sc c1"><div class="n" id="sT">0</div><div class="l">📊 Total</div></div>
+        <div class="sc c2"><div class="n" id="sA">0</div><div class="l">✅ Active</div></div>
+        <div class="sc c3"><div class="n" id="sI">0</div><div class="l">❌ Inactive</div></div>
+        <div class="sc c4"><div class="n" id="sP">0</div><div class="l">⏳ Pending</div></div>
+    </div>
+    <div class="ct">
+        <div class="sb"><input id="src" placeholder="🔍 Search..." oninput="render()"><select id="flt" onchange="render()"><option value="all">All</option><option value="Active">Active</option><option value="Inactive">Inactive</option><option value="Pending">Pending</option></select></div>
+        <div class="bg3">
+            <button class="btn b-a" onclick="openAdd()">➕ Add</button>
+            <button class="btn b-e" onclick="expCSV()">📗 Excel</button>
+            <button class="btn b-b" onclick="bkp()">💾 Backup</button>
+            <button class="btn b-r" onclick="rst()">📥 Restore</button>
+            <button class="btn b-p" onclick="window.print()">🖨️</button>
+        </div>
+    </div>
+    <div class="tbx"><div class="tw"><table><thead><tr><th>S.No</th><th>Code</th><th>Name</th><th>Aadhar</th><th>Address</th><th>Bank</th><th>A/C</th><th>IFSC</th><th>Branch</th><th>Mobile</th><th>Status</th><th>Action</th></tr></thead><tbody id="tb"></tbody></table></div><div class="pag" id="pgn"></div></div>
+
+    <div class="ov" id="fOv"><div class="ml"><div class="mh"><h2 id="mTi">➕ Add</h2><button class="cx" onclick="cFm()">&times;</button></div><div class="mb"><input type="hidden" id="eIdx" value=""><div class="fg"><div class="fi"><label>Code <span class="rq">*</span></label><input id="f1"></div><div class="fi"><label>Name <span class="rq">*</span></label><input id="f2"></div><div class="fi"><label>Aadhar <span class="rq">*</span></label><input id="f3" maxlength="14" oninput="fmA(this)"></div><div class="fi"><label>Mobile <span class="rq">*</span></label><input id="f4" maxlength="10" oninput="this.value=this.value.replace(/\D/g,'')"></div><div class="fi fw"><label>Address <span class="rq">*</span></label><textarea id="f5"></textarea></div><div class="fi"><label>Bank <span class="rq">*</span></label><input id="f6"></div><div class="fi"><label>A/C <span class="rq">*</span></label><input id="f7"></div><div class="fi"><label>IFSC <span class="rq">*</span></label><input id="f8" style="text-transform:uppercase"></div><div class="fi"><label>Branch</label><input id="f9"></div><div class="fi"><label>Status</label><select id="f10"><option value="Active">Active</option><option value="Pending">Pending</option><option value="Inactive">Inactive</option></select></div></div></div><div class="mf"><button class="btn sc2" onclick="cFm()">Cancel</button><button class="btn ss2" onclick="saveF()">💾 Save</button></div></div></div>
+
+    <div class="ov" id="vOv"><div class="ml"><div class="mh"><h2>👁️ Details</h2><button class="cx" onclick="cVm()">&times;</button></div><div class="mb"><div class="vg" id="vCt"></div></div><div class="mf"><button class="btn sc2" onclick="cVm()">Close</button></div></div></div>
+</div>
 
 <script>
-// ==========================================
-// 🔥 FIREBASE SETUP (FREE ONLINE DATABASE)
-// ==========================================
-
-// ⚠️ IMPORTANT: Apna Firebase project banao aur ye config change karo
-// Step neeche diye hain
-
+// ================================================================
+// 🔥 FIREBASE CONFIG - APNA CONFIG PASTE KARO
+// ================================================================
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDLrpJRQcgo9jmXP4p62uDCjEFDQhyHkTE",
+  authDomain: "farmer-database-9122d.firebaseapp.com",
+  databaseURL: "https://farmer-database-9122d-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "farmer-database-9122d",
+  storageBucket: "farmer-database-9122d.firebasestorage.app",
+  messagingSenderId: "401983756635",
+  appId: "1:401983756635:web:e7b2251da9cff9384e227e",
+  measurementId: "G-WK2G7JK4BN"
 };
+// ================================================================
 
-// Initialize Firebase
 let db = null;
-let dbRef = null;
+let CU = null;       // Current User {mobile, name}
+let FD = [];         // Farmer Data array
+let FKEYS = {};      // Firebase keys mapping {index: firebaseKey}
 let isOnline = false;
-let farmers = [];
-let farmerKeys = {};
-let page = 1;
-const PER = 10;
+let farmerRef = null;
+let pg = 1;
+const PP = 10;
 
-// ==========================================
-// INITIALIZE
-// ==========================================
+// ================================================================
+// 🔥 FIREBASE INIT
+// ================================================================
 function initFirebase() {
     try {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.database();
-        dbRef = db.ref('farmers');
+        if (FIREBASE_CONFIG.apiKey === "YOUR_API_KEY") {
+            setConn('off');
+            toast('⚠️ Firebase config daalo!', 'w');
+            return;
+        }
 
-        // Real-time listener - jab bhi data change ho, auto update
-        dbRef.on('value', function(snapshot) {
-            isOnline = true;
-            farmers = [];
-            farmerKeys = {};
+        firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.database();
+
+        db.ref('.info/connected').on('value', function(snap) {
+            isOnline = snap.val() === true;
+            setConn(isOnline ? 'on' : 'off');
+        });
+
+        setConn('on');
+    } catch(e) {
+        console.error('Firebase init error:', e);
+        setConn('off');
+    }
+}
+
+function setConn(s) {
+    const el = document.getElementById('connSt');
+    const sb = document.getElementById('syncB');
+    if (s === 'on') {
+        if(el) { el.className = 'conn c-on'; el.textContent = '☁️ Firebase Connected ✅'; }
+        if(sb) { sb.className = 'sb2 sb-on'; sb.textContent = '☁️ Synced'; }
+    } else {
+        if(el) { el.className = 'conn c-off'; el.textContent = '❌ Firebase not connected'; }
+        if(sb) { sb.className = 'sb2 sb-off'; sb.textContent = '📴 Offline'; }
+    }
+}
+
+// ================================================================
+// 🔐 AUTH - REGISTER
+// ================================================================
+async function doReg() {
+    const name = document.getElementById('rN').value.trim();
+    const mob = document.getElementById('rM').value.trim();
+    const pass = document.getElementById('rP').value;
+    const conf = document.getElementById('rC').value;
+
+    if (!name) { sMsg('❌ Name required!','e'); return; }
+    if (mob.length !== 10) { sMsg('❌ 10-digit mobile!','e'); return; }
+    if (pass.length < 4) { sMsg('❌ Min 4 char password!','e'); return; }
+    if (pass !== conf) { sMsg('❌ Password not matching!','e'); return; }
+
+    const btn = document.getElementById('rBtn');
+    btn.innerHTML = '<div class="spn"></div> Creating...'; btn.classList.add('bld');
+
+    try {
+        if (db && isOnline) {
+            // Check if exists on Firebase
+            const snap = await db.ref('users/' + mob).once('value');
+            if (snap.exists()) {
+                sMsg('❌ Mobile already registered! Login karein.','e');
+                rBtn2(btn, '📝 Create Account'); return;
+            }
+
+            // Save to Firebase
+            await db.ref('users/' + mob).set({
+                name: name, mobile: mob,
+                password: btoa(pass),
+                created: new Date().toISOString()
+            });
+        }
+
+        // Also save locally always
+        const lu = JSON.parse(localStorage.getItem('USERS') || '{}');
+        if (lu[mob]) { sMsg('❌ Already registered!','e'); rBtn2(btn,'📝 Create Account'); return; }
+        lu[mob] = { name, mobile: mob, password: btoa(pass), created: new Date().toISOString() };
+        localStorage.setItem('USERS', JSON.stringify(lu));
+
+        sMsg('✅ Account created! Login karein.','s');
+        document.getElementById('rN').value = '';
+        document.getElementById('rM').value = '';
+        document.getElementById('rP').value = '';
+        document.getElementById('rC').value = '';
+
+        setTimeout(() => { swT('login'); document.getElementById('lM').value = mob; document.getElementById('lP').focus(); rBtn2(btn,'📝 Create Account'); }, 1000);
+
+    } catch(e) {
+        sMsg('❌ Error: ' + e.message,'e');
+        rBtn2(btn, '📝 Create Account');
+    }
+}
+
+// ================================================================
+// 🔐 AUTH - LOGIN
+// ================================================================
+async function doLogin() {
+    const mob = document.getElementById('lM').value.trim();
+    const pass = document.getElementById('lP').value;
+
+    if (mob.length !== 10) { sMsg('❌ 10-digit mobile!','e'); return; }
+    if (!pass) { sMsg('❌ Password required!','e'); return; }
+
+    const btn = document.getElementById('lBtn');
+    btn.innerHTML = '<div class="spn"></div> Checking...'; btn.classList.add('bld');
+
+    let user = null;
+
+    try {
+        // TRY 1: Firebase se check karo
+        if (db && isOnline) {
+            const snap = await db.ref('users/' + mob).once('value');
+            if (snap.exists()) {
+                user = snap.val();
+                // Local mein bhi save karo
+                const lu = JSON.parse(localStorage.getItem('USERS') || '{}');
+                lu[mob] = user;
+                localStorage.setItem('USERS', JSON.stringify(lu));
+            }
+        }
+
+        // TRY 2: Local se check karo (fallback)
+        if (!user) {
+            const lu = JSON.parse(localStorage.getItem('USERS') || '{}');
+            user = lu[mob] || null;
+        }
+
+        if (!user) {
+            sMsg('❌ Mobile not registered! Account banayein.','e');
+            rBtn2(btn,'🔑 Login'); return;
+        }
+
+        // Password check
+        if (atob(user.password) !== pass) {
+            sMsg('❌ Wrong password!','e');
+            rBtn2(btn,'🔑 Login'); return;
+        }
+
+        // SUCCESS
+        CU = { mobile: mob, name: user.name, loginTime: new Date().toISOString() };
+        localStorage.setItem('SESSION', JSON.stringify(CU));
+
+        if (document.getElementById('remMe').checked) localStorage.setItem('REM', mob);
+        else localStorage.removeItem('REM');
+
+        sMsg('✅ Login successful!','s');
+        setTimeout(() => { rBtn2(btn,'🔑 Login'); showHome(); }, 600);
+
+    } catch(e) {
+        // Final fallback - local
+        const lu = JSON.parse(localStorage.getItem('USERS') || '{}');
+        if (lu[mob] && atob(lu[mob].password) === pass) {
+            CU = { mobile: mob, name: lu[mob].name, loginTime: new Date().toISOString() };
+            localStorage.setItem('SESSION', JSON.stringify(CU));
+            sMsg('✅ Logged in (offline)','s');
+            setTimeout(() => { rBtn2(btn,'🔑 Login'); showHome(); }, 600);
+        } else {
+            sMsg('❌ Login failed!','e');
+            rBtn2(btn,'🔑 Login');
+        }
+    }
+}
+
+// ================================================================
+// 🏠 SHOW HOME - LOAD FARMER DATA
+// ================================================================
+function showHome() {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('homePage').style.display = 'block';
+    document.getElementById('uDsp').innerHTML = '👤 <strong>' + CU.name + '</strong>';
+    document.getElementById('welc').textContent = '👤 ' + CU.name + ' | 📱 ' + CU.mobile;
+
+    loadFarmers();
+}
+
+function showLogin() {
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('homePage').style.display = 'none';
+    try { const r = localStorage.getItem('REM'); if(r) document.getElementById('lM').value = r; } catch(e) {}
+}
+
+// ================================================================
+// 📦 LOAD FARMERS - Firebase listener + Local fallback
+// ================================================================
+function loadFarmers() {
+    const localKey = 'FD_' + CU.mobile;
+
+    if (db && isOnline) {
+        // Firebase real-time listener
+        farmerRef = db.ref('farmerData/' + CU.mobile);
+
+        farmerRef.on('value', function(snapshot) {
+            FD = [];
+            FKEYS = {};
+            let idx = 0;
 
             if (snapshot.exists()) {
                 snapshot.forEach(function(child) {
                     const f = child.val();
-                    f._key = child.key;
-                    farmerKeys[f.code] = child.key;
-                    farmers.push(f);
+                    FKEYS[idx] = child.key;
+                    FD.push(f);
+                    idx++;
                 });
             }
 
-            // Local backup
-            localStorage.setItem('farmerDB_online', JSON.stringify(farmers));
+            // Always save to local as backup
+            localStorage.setItem(localKey, JSON.stringify(FD));
+            console.log('☁️ Firebase loaded: ' + FD.length + ' farmers');
 
-            updateSyncStatus('online');
-            renderTable();
-            hideLoading();
+            setConn('on');
+            render();
         });
 
-        // Connection status monitor
-        db.ref('.info/connected').on('value', function(snap) {
-            if (snap.val() === true) {
-                isOnline = true;
-                updateSyncStatus('online');
-            } else {
-                isOnline = false;
-                updateSyncStatus('offline');
-            }
-        });
-
-    } catch (error) {
-        console.error('Firebase Error:', error);
-        loadOfflineData();
-        updateSyncStatus('error');
-        hideLoading();
-    }
-}
-
-function loadOfflineData() {
-    try {
-        const saved = localStorage.getItem('farmerDB_online');
-        if (saved) {
-            farmers = JSON.parse(saved);
-        }
-    } catch(e) {
-        farmers = [];
-    }
-}
-
-function updateSyncStatus(status) {
-    const badge = document.getElementById('modeBadge');
-    const dot = document.getElementById('syncDot');
-    const syncText = document.getElementById('syncStatus');
-    const now = new Date().toLocaleString('en-IN');
-
-    if (status === 'online') {
-        badge.className = 'mode-badge mode-online';
-        badge.textContent = '🟢 ONLINE - Real-time Sync Active';
-        dot.className = 'dot dot-green';
-        syncText.textContent = 'Connected & Syncing ✅';
-        document.getElementById('lastSync').textContent = now;
-    } else if (status === 'offline') {
-        badge.className = 'mode-badge mode-offline';
-        badge.textContent = '🟡 OFFLINE - Using Cached Data';
-        dot.className = 'dot dot-yellow';
-        syncText.textContent = 'Offline - Will sync when connected ⏳';
     } else {
-        badge.className = 'mode-badge mode-error';
-        badge.textContent = '🔴 Setup Required - See Console';
-        dot.className = 'dot dot-red';
-        syncText.textContent = 'Firebase not configured ❌';
+        // Local fallback
+        try {
+            FD = JSON.parse(localStorage.getItem(localKey) || '[]');
+        } catch(e) { FD = []; }
+
+        console.log('💾 Local loaded: ' + FD.length + ' farmers');
+        render();
     }
 }
 
-function hideLoading() {
-    document.getElementById('loadingScreen').classList.add('hidden');
-}
+// ================================================================
+// 💾 SAVE SINGLE FARMER TO FIREBASE
+// ================================================================
+async function saveToFirebase(farmerData, editKey) {
+    if (!db || !isOnline) return false;
 
-// ==========================================
-// FORMAT & VALIDATE
-// ==========================================
-function fmtAadhar(inp) {
-    let v=inp.value.replace(/\D/g,'');
-    if(v.length>12)v=v.substring(0,12);
-    let f='';
-    for(let i=0;i<v.length;i++){if(i>0&&i%4===0)f+='-';f+=v[i];}
-    inp.value=f;
-}
+    try {
+        const ref = db.ref('farmerData/' + CU.mobile);
 
-function validate() {
-    const req = [
-        {id:'fCode',n:'Farmer Code'},{id:'fName',n:'Name'},
-        {id:'fAadhar',n:'Aadhar'},{id:'fMobile',n:'Mobile'},
-        {id:'fAddr',n:'Address'},{id:'fBank',n:'Bank'},
-        {id:'fAC',n:'Bank A/C'},{id:'fIFSC',n:'IFSC'}
-    ];
-    for(let f of req) {
-        if(!document.getElementById(f.id).value.trim()) {
-            toast('❌ '+f.n+' required!','e');
-            document.getElementById(f.id).focus();
-            return false;
+        if (editKey) {
+            // UPDATE - sirf wo ek farmer update karo
+            await ref.child(editKey).set(farmerData);
+            console.log('☁️ Updated farmer: ' + editKey);
+        } else {
+            // ADD - naya farmer push karo
+            await ref.push(farmerData);
+            console.log('☁️ Added new farmer');
         }
+        return true;
+    } catch(e) {
+        console.error('Firebase save error:', e);
+        return false;
     }
-    if(document.getElementById('fAadhar').value.replace(/\D/g,'').length!==12) {
-        toast('❌ Aadhar: 12 digits!','e'); return false;
+}
+
+// ================================================================
+// 🗑️ DELETE FROM FIREBASE
+// ================================================================
+async function deleteFromFirebase(firebaseKey) {
+    if (!db || !isOnline || !firebaseKey) return false;
+
+    try {
+        await db.ref('farmerData/' + CU.mobile + '/' + firebaseKey).remove();
+        console.log('☁️ Deleted from Firebase: ' + firebaseKey);
+        return true;
+    } catch(e) {
+        console.error('Firebase delete error:', e);
+        return false;
     }
-    if(!/^\d{10}$/.test(document.getElementById('fMobile').value.trim())) {
-        toast('❌ Mobile: 10 digits!','e'); return false;
+}
+
+// ================================================================
+// CRUD OPERATIONS
+// ================================================================
+function fmA(i){let v=i.value.replace(/\D/g,'');if(v.length>12)v=v.substring(0,12);let r='';for(let x=0;x<v.length;x++){if(x>0&&x%4===0)r+='-';r+=v[x];}i.value=r;}
+
+function stats(){
+    document.getElementById('sT').textContent=FD.length;
+    document.getElementById('sA').textContent=FD.filter(f=>f.s==='Active').length;
+    document.getElementById('sI').textContent=FD.filter(f=>f.s==='Inactive').length;
+    document.getElementById('sP').textContent=FD.filter(f=>f.s==='Pending').length;
+}
+
+function render(){
+    const s=(document.getElementById('src')||{}).value||'';
+    const sl=s.toLowerCase();
+    const sf=(document.getElementById('flt')||{}).value||'all';
+
+    let F=FD.filter(f=>{
+        const ms=!sl||(f.n||'').toLowerCase().includes(sl)||(f.c||'').toLowerCase().includes(sl)||(f.a||'').includes(sl)||(f.m||'').includes(sl)||(f.b||'').toLowerCase().includes(sl)||(f.ad||'').toLowerCase().includes(sl);
+        return ms&&(sf==='all'||f.s===sf);
+    });
+
+    const tp=Math.ceil(F.length/PP)||1;
+    if(pg>tp)pg=1;
+    const st=(pg-1)*PP,pd=F.slice(st,st+PP);
+    const tb=document.getElementById('tb');
+    if(!tb)return;
+
+    if(F.length===0){
+        tb.innerHTML=`<tr><td colspan="12"><div class="nd"><span>🌾</span><p>No farmers! Click ➕ Add</p></div></td></tr>`;
+        document.getElementById('pgn').innerHTML='';stats();return;
     }
+
+    tb.innerHTML=pd.map((f,i)=>{
+        const gi=FD.indexOf(f);
+        const bc=f.s==='Active'?'g1':f.s==='Inactive'?'g2':'g3';
+        return `<tr><td><b>${st+i+1}</b></td><td><b style="color:#0a3d1f">${f.c||''}</b></td><td>${f.n||''}</td><td>${f.a||''}</td><td title="${f.ad||''}">${(f.ad||'').length>16?(f.ad||'').substring(0,16)+'...':f.ad||''}</td><td>${f.b||''}</td><td>${f.ac||''}</td><td><code>${f.if||''}</code></td><td>${f.br||'-'}</td><td><a href="tel:${f.m}">📞${f.m||''}</a></td><td><span class="bdg ${bc}">${f.s||''}</span></td><td><div class="acts"><button class="btn sm sv2" onclick="viewF(${gi})">👁️</button><button class="btn sm se2" onclick="editF(${gi})">✏️</button><button class="btn sm sd2" onclick="delF(${gi})">🗑️</button></div></td></tr>`;
+    }).join('');
+
+    let ph='';
+    if(tp>1){ph+=`<button onclick="goP(${pg-1})" ${pg===1?'disabled':''}>◀</button>`;for(let i=1;i<=tp;i++)ph+=`<button onclick="goP(${i})" class="${i===pg?'act':''}">${i}</button>`;ph+=`<button onclick="goP(${pg+1})" ${pg===tp?'disabled':''}>▶</button>`;}
+    document.getElementById('pgn').innerHTML=ph;stats();
+}
+
+function goP(p){pg=p;render();}
+
+function openAdd(){
+    document.getElementById('mTi').textContent='➕ Add Farmer';
+    document.getElementById('eIdx').value='';
+    clrF();
+    let mx=0;FD.forEach(f=>{const n=parseInt((f.c||'').replace(/\D/g,''));if(n>mx)mx=n;});
+    document.getElementById('f1').value='FR-'+String(mx+1).padStart(3,'0');
+    document.getElementById('fOv').classList.add('on');
+}
+
+function cFm(){document.getElementById('fOv').classList.remove('on');}
+function cVm(){document.getElementById('vOv').classList.remove('on');}
+function clrF(){['f1','f2','f3','f4','f5','f6','f7','f8','f9'].forEach(id=>document.getElementById(id).value='');document.getElementById('f10').value='Active';}
+
+function valF(){
+    const r=[{id:'f1',n:'Code'},{id:'f2',n:'Name'},{id:'f3',n:'Aadhar'},{id:'f4',n:'Mobile'},{id:'f5',n:'Address'},{id:'f6',n:'Bank'},{id:'f7',n:'A/C'},{id:'f8',n:'IFSC'}];
+    for(let f of r){if(!document.getElementById(f.id).value.trim()){toast('❌ '+f.n+' required!','e');document.getElementById(f.id).focus();return false;}}
+    if(document.getElementById('f3').value.replace(/\D/g,'').length!==12){toast('❌ Aadhar: 12 digits!','e');return false;}
+    if(!/^\d{10}$/.test(document.getElementById('f4').value.trim())){toast('❌ Mobile: 10 digits!','e');return false;}
     return true;
 }
 
-// ==========================================
-// STATS
-// ==========================================
-function updateStats() {
-    document.getElementById('sTotal').textContent = farmers.length;
-    document.getElementById('sActive').textContent = farmers.filter(f=>f.status==='Active').length;
-    document.getElementById('sInactive').textContent = farmers.filter(f=>f.status==='Inactive').length;
-    document.getElementById('sPending').textContent = farmers.filter(f=>f.status==='Pending').length;
-}
+// ================================================================
+// 💾 SAVE FARMER - Firebase + Local BOTH
+// ================================================================
+async function saveF(){
+    if(!valF())return;
 
-// ==========================================
-// RENDER TABLE
-// ==========================================
-function renderTable() {
-    const s = document.getElementById('searchInput').value.toLowerCase();
-    const sf = document.getElementById('filterStatus').value;
-
-    let filtered = farmers.filter(f => {
-        const ms = !s || f.name.toLowerCase().includes(s) || f.code.toLowerCase().includes(s) ||
-            f.aadhar.includes(s) || f.mobile.includes(s) || f.bank.toLowerCase().includes(s);
-        const mf = sf==='all' || f.status===sf;
-        return ms && mf;
-    });
-
-    const tp = Math.ceil(filtered.length/PER)||1;
-    if(page>tp) page=1;
-    const start = (page-1)*PER;
-    const paged = filtered.slice(start,start+PER);
-
-    const tbody = document.getElementById('tbody');
-
-    if(filtered.length===0) {
-        tbody.innerHTML = `<tr><td colspan="12"><div class="nodata"><span>🌾</span><p>No farmers found!</p></div></td></tr>`;
-        document.getElementById('paging').innerHTML='';
-        updateStats(); return;
-    }
-
-    tbody.innerHTML = paged.map((f,i) => {
-        const bc = f.status==='Active'?'ba1':f.status==='Inactive'?'ba2':'ba3';
-        return `<tr>
-            <td><strong>${start+i+1}</strong></td>
-            <td><strong style="color:#0a3d1f">${f.code}</strong></td>
-            <td>${f.name}</td>
-            <td>${f.aadhar}</td>
-            <td title="${f.addr}">${f.addr.length>20?f.addr.substring(0,20)+'...':f.addr}</td>
-            <td>${f.bank}</td>
-            <td>${f.ac}</td>
-            <td><code>${f.ifsc}</code></td>
-            <td>${f.branch||'-'}</td>
-            <td><a href="tel:${f.mobile}">📞${f.mobile}</a></td>
-            <td><span class="badge ${bc}">${f.status}</span></td>
-            <td>
-                <div class="acts">
-                    <button class="btn sm sv" onclick="viewF('${f.code}')">👁️</button>
-                    <button class="btn sm sed" onclick="editF('${f.code}')">✏️</button>
-                    <button class="btn sm sdl" onclick="delF('${f.code}')">🗑️</button>
-                </div>
-            </td>
-        </tr>`;
-    }).join('');
-
-    // Pagination
-    let ph='';
-    if(tp>1) {
-        ph+=`<button onclick="goP(${page-1})" ${page===1?'disabled':''}>◀</button>`;
-        for(let i=1;i<=tp;i++) ph+=`<button onclick="goP(${i})" class="${i===page?'act':''}">${i}</button>`;
-        ph+=`<button onclick="goP(${page+1})" ${page===tp?'disabled':''}>▶</button>`;
-    }
-    document.getElementById('paging').innerHTML=ph;
-    updateStats();
-}
-
-function goP(p){page=p;renderTable();}
-
-// ==========================================
-// CRUD OPERATIONS
-// ==========================================
-function openAdd() {
-    document.getElementById('mTitle').textContent='➕ Add Farmer';
-    document.getElementById('editKey').value='';
-    clearForm();
-    document.getElementById('fCode').value='FR-'+String(farmers.length+1).padStart(3,'0');
-    document.getElementById('formModal').classList.add('on');
-}
-
-function closeForm(){document.getElementById('formModal').classList.remove('on');}
-function closeView(){document.getElementById('viewModal').classList.remove('on');}
-
-function clearForm() {
-    ['fCode','fName','fAadhar','fMobile','fAddr','fBank','fAC','fIFSC','fBranch'].forEach(id=>{
-        document.getElementById(id).value='';
-    });
-    document.getElementById('fStatus').value='Active';
-}
-
-// SAVE (Add or Edit)
-async function saveFarmer() {
-    if(!validate()) return;
-
-    const data = {
-        code: document.getElementById('fCode').value.trim(),
-        name: document.getElementById('fName').value.trim(),
-        aadhar: document.getElementById('fAadhar').value.trim(),
-        mobile: document.getElementById('fMobile').value.trim(),
-        addr: document.getElementById('fAddr').value.trim(),
-        bank: document.getElementById('fBank').value.trim(),
-        ac: document.getElementById('fAC').value.trim(),
-        ifsc: document.getElementById('fIFSC').value.trim().toUpperCase(),
-        branch: document.getElementById('fBranch').value.trim(),
-        status: document.getElementById('fStatus').value,
-        updated: new Date().toLocaleString('en-IN')
+    const d = {
+        c:document.getElementById('f1').value.trim(),
+        n:document.getElementById('f2').value.trim(),
+        a:document.getElementById('f3').value.trim(),
+        m:document.getElementById('f4').value.trim(),
+        ad:document.getElementById('f5').value.trim(),
+        b:document.getElementById('f6').value.trim(),
+        ac:document.getElementById('f7').value.trim(),
+        if:document.getElementById('f8').value.trim().toUpperCase(),
+        br:document.getElementById('f9').value.trim(),
+        s:document.getElementById('f10').value,
+        du:new Date().toISOString()
     };
 
-    const editKey = document.getElementById('editKey').value;
+    const editKey = document.getElementById('eIdx').value;
 
-    try {
-        if(editKey) {
-            // UPDATE
-            data.added = farmers.find(f=>f.code===editKey)?.added || data.updated;
-            await dbRef.child(farmerKeys[editKey]).update(data);
-            toast('✅ Updated & synced to cloud!','s');
-        } else {
-            // ADD - check duplicate
-            if(farmers.find(f=>f.code===data.code)) {
-                toast('❌ Code already exists!','e'); return;
-            }
-            data.added = data.updated;
-            await dbRef.push(data);
-            toast('✅ Added & synced to cloud!','s');
+    if(editKey){
+        // EDIT MODE
+        const idx = FD.findIndex((f,i) => FKEYS[i] === editKey);
+        d.da = (idx >= 0 && FD[idx]) ? (FD[idx].da || d.du) : d.du;
+
+        // Save to Firebase (update existing)
+        const saved = await saveToFirebase(d, editKey);
+
+        if(!saved){
+            // Offline fallback
+            if(idx >= 0) FD[idx] = d;
+            localStorage.setItem('FD_'+CU.mobile, JSON.stringify(FD));
+            render();
         }
-        closeForm();
-    } catch(error) {
-        // Offline save
-        if(editKey) {
-            const idx = farmers.findIndex(f=>f.code===editKey);
-            if(idx>-1) farmers[idx] = data;
-        } else {
-            farmers.push(data);
+
+        toast('✅ Updated!' + (saved ? ' ☁️' : ' 💾'),'s');
+
+    } else {
+        // ADD MODE
+        if(FD.find(f=>f.c===d.c)){toast('❌ Code exists!','e');return;}
+        d.da = d.du;
+
+        // Save to Firebase (push new)
+        const saved = await saveToFirebase(d, null);
+
+        if(!saved){
+            // Offline fallback
+            FD.push(d);
+            localStorage.setItem('FD_'+CU.mobile, JSON.stringify(FD));
+            render();
         }
-        localStorage.setItem('farmerDB_online', JSON.stringify(farmers));
-        renderTable();
-        closeForm();
-        toast('⚠️ Saved offline. Will sync when online.','w');
+
+        toast('✅ Added!' + (saved ? ' ☁️' : ' 💾'),'s');
     }
+
+    cFm();
 }
 
 // VIEW
-function viewF(code) {
-    const f = farmers.find(x=>x.code===code);
-    if(!f) return;
-    const bc = f.status==='Active'?'ba1':f.status==='Inactive'?'ba2':'ba3';
-    document.getElementById('viewContent').innerHTML=`
-        <div class="vi"><label>Farmer Code</label><p>${f.code}</p></div>
-        <div class="vi"><label>Farmer Name</label><p>${f.name}</p></div>
-        <div class="vi"><label>Aadhar</label><p>${f.aadhar}</p></div>
-        <div class="vi"><label>Mobile</label><p>📞 ${f.mobile}</p></div>
-        <div class="vi fw"><label>Address</label><p>${f.addr}</p></div>
-        <div class="vi"><label>Bank</label><p>🏦 ${f.bank}</p></div>
-        <div class="vi"><label>A/C</label><p>${f.ac}</p></div>
-        <div class="vi"><label>IFSC</label><p><code>${f.ifsc}</code></p></div>
-        <div class="vi"><label>Branch</label><p>${f.branch||'N/A'}</p></div>
-        <div class="vi"><label>Status</label><p><span class="badge ${bc}">${f.status}</span></p></div>
-        <div class="vi"><label>Added</label><p>📅 ${f.added||'N/A'}</p></div>
-        <div class="vi"><label>Updated</label><p>🔄 ${f.updated||'N/A'}</p></div>
-    `;
-    document.getElementById('viewModal').classList.add('on');
+function viewF(i){
+    const f=FD[i];if(!f)return;
+    const bc=f.s==='Active'?'g1':f.s==='Inactive'?'g2':'g3';
+    document.getElementById('vCt').innerHTML=`<div class="vx"><label>Code</label><p>${f.c}</p></div><div class="vx"><label>Name</label><p>${f.n}</p></div><div class="vx"><label>Aadhar</label><p>${f.a}</p></div><div class="vx"><label>Mobile</label><p>📞${f.m}</p></div><div class="vx fw"><label>Address</label><p>${f.ad}</p></div><div class="vx"><label>Bank</label><p>🏦${f.b}</p></div><div class="vx"><label>A/C</label><p>${f.ac}</p></div><div class="vx"><label>IFSC</label><p><code>${f.if}</code></p></div><div class="vx"><label>Branch</label><p>${f.br||'N/A'}</p></div><div class="vx"><label>Status</label><p><span class="bdg ${bc}">${f.s}</span></p></div><div class="vx"><label>Added</label><p>${f.da||'N/A'}</p></div><div class="vx"><label>Updated</label><p>${f.du||'N/A'}</p></div>`;
+    document.getElementById('vOv').classList.add('on');
 }
 
 // EDIT
-function editF(code) {
-    const f = farmers.find(x=>x.code===code);
-    if(!f) return;
-    document.getElementById('mTitle').textContent='✏️ Edit Farmer';
-    document.getElementById('editKey').value=code;
-    document.getElementById('fCode').value=f.code;
-    document.getElementById('fName').value=f.name;
-    document.getElementById('fAadhar').value=f.aadhar;
-    document.getElementById('fMobile').value=f.mobile;
-    document.getElementById('fAddr').value=f.addr;
-    document.getElementById('fBank').value=f.bank;
-    document.getElementById('fAC').value=f.ac;
-    document.getElementById('fIFSC').value=f.ifsc;
-    document.getElementById('fBranch').value=f.branch||'';
-    document.getElementById('fStatus').value=f.status;
-    document.getElementById('formModal').classList.add('on');
+function editF(i){
+    const f=FD[i];if(!f)return;
+    document.getElementById('mTi').textContent='✏️ Edit';
+    document.getElementById('eIdx').value=FKEYS[i]||('local_'+i);
+    document.getElementById('f1').value=f.c||'';
+    document.getElementById('f2').value=f.n||'';
+    document.getElementById('f3').value=f.a||'';
+    document.getElementById('f4').value=f.m||'';
+    document.getElementById('f5').value=f.ad||'';
+    document.getElementById('f6').value=f.b||'';
+    document.getElementById('f7').value=f.ac||'';
+    document.getElementById('f8').value=f.if||'';
+    document.getElementById('f9').value=f.br||'';
+    document.getElementById('f10').value=f.s||'Active';
+    document.getElementById('fOv').classList.add('on');
 }
 
 // DELETE
-async function delF(code) {
-    const f = farmers.find(x=>x.code===code);
-    if(!confirm(`⚠️ Delete "${f?.name}" (${code})?\n\nSab jagah se delete ho jayega!`)) return;
+async function delF(i){
+    if(!confirm('⚠️ Delete "'+FD[i].n+'" ('+FD[i].c+')?\n\n💡 Tip: Pehle Backup le lo!'))return;
 
-    try {
-        if(farmerKeys[code]) {
-            await dbRef.child(farmerKeys[code]).remove();
-        }
-        toast('🗑️ Deleted & synced!','s');
-    } catch(error) {
-        farmers = farmers.filter(f=>f.code!==code);
-        localStorage.setItem('farmerDB_online', JSON.stringify(farmers));
-        renderTable();
-        toast('🗑️ Deleted offline.','w');
+    const firebaseKey = FKEYS[i];
+
+    if(firebaseKey && db && isOnline){
+        await deleteFromFirebase(firebaseKey);
+        // Firebase listener auto update karega
+        toast('🗑️ Deleted from cloud!','s');
+    } else {
+        FD.splice(i,1);
+        localStorage.setItem('FD_'+CU.mobile, JSON.stringify(FD));
+        render();
+        toast('🗑️ Deleted (local)!','s');
     }
 }
 
-// ==========================================
-// EXPORT & BACKUP
-// ==========================================
-function exportExcel() {
-    if(farmers.length===0){toast('❌ No data!','e');return;}
-    const h=['S.No.','Farmer Code','Farmer Name','Aadhar Number','Address','Bank Name','Bank A/C','IFSC Code','Branch','Mobile No.','Status','Date Added','Updated'];
+// ================================================================
+// EXPORT / BACKUP / RESTORE
+// ================================================================
+function expCSV(){
+    if(!FD.length){toast('❌ No data!','e');return;}
+    const h=['S.No','Code','Name','Aadhar','Address','Bank','A/C','IFSC','Branch','Mobile','Status','Added','Updated'];
     let csv='\uFEFF'+h.join(',')+'\n';
-    farmers.forEach((f,i)=>{
-        csv+=[i+1,q(f.code),q(f.name),q(f.aadhar),q(f.addr),q(f.bank),q(f.ac),q(f.ifsc),q(f.branch),q(f.mobile),q(f.status),q(f.added||''),q(f.updated||'')].join(',')+'\n';
-    });
-    dlFile(csv,`Farmer_DB_${getD()}.csv`,'text/csv;charset=utf-8');
+    FD.forEach((f,i)=>{csv+=[i+1,q(f.c),q(f.n),q(f.a),q(f.ad),q(f.b),q(f.ac),q(f.if),q(f.br),q(f.m),q(f.s),q(f.da),q(f.du)].join(',')+'\n';});
+    dlFile(csv,'Farmers_'+CU.name+'_'+gDt()+'.csv','text/csv;charset=utf-8');
     toast('📗 Excel exported!','s');
 }
 
-function backupJSON() {
-    if(farmers.length===0){toast('❌ No data!','e');return;}
-    const json=JSON.stringify({date:new Date().toLocaleString('en-IN'),count:farmers.length,data:farmers},null,2);
-    dlFile(json,`Farmer_Backup_${getD()}.json`,'application/json');
+function bkp(){
+    if(!FD.length){toast('❌ No data!','e');return;}
+    dlFile(JSON.stringify({user:CU.name,mobile:CU.mobile,date:new Date().toLocaleString('en-IN'),count:FD.length,data:FD},null,2),'Backup_'+CU.name+'_'+gDt()+'.json','application/json');
     toast('💾 Backup saved!','s');
 }
 
+function rst(){
+    const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+    inp.onchange=async function(e){
+        const file=e.target.files[0];if(!file)return;
+        const reader=new FileReader();
+        reader.onload=async function(ev){
+            try{
+                const d=JSON.parse(ev.target.result);
+                if(d.data&&Array.isArray(d.data)){
+                    if(!confirm('⚠️ Add '+d.data.length+' farmers from backup?\n\n(Existing data SAFE rahega - sirf add hoga)'))return;
+
+                    let added=0;
+                    for(const farmer of d.data){
+                        // DUPLICATE CHECK - sirf naye add karo
+                        if(!FD.find(f=>f.c===farmer.c)){
+                            const saved = await saveToFirebase(farmer, null);
+                            if(!saved){
+                                FD.push(farmer);
+                            }
+                            added++;
+                        }
+                    }
+
+                    if(!db||!isOnline){
+                        localStorage.setItem('FD_'+CU.mobile,JSON.stringify(FD));
+                        render();
+                    }
+
+                    toast('✅ '+added+' new farmers added!','s');
+                }
+            }catch(er){toast('❌ Error!','e');}
+        };reader.readAsText(file);
+    };inp.click();
+}
+
 function q(v){return '"'+String(v||'').replace(/"/g,'""')+'"';}
-function getD(){return new Date().toISOString().slice(0,10);}
-function dlFile(c,n,t){
-    const b=new Blob([c],{type:t}),u=URL.createObjectURL(b),a=document.createElement('a');
-    a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);
-}
+function gDt(){return new Date().toISOString().slice(0,10);}
+function dlFile(c,n,t){const b=new Blob([c],{type:t}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);}
 
-// ==========================================
-// SHARE LINK
-// ==========================================
-function copyLink() {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url).then(()=>{
-        toast('🔗 Link copied! Share with anyone.','s');
-    }).catch(()=>{
-        prompt('Copy this link:', url);
-    });
-}
+// ================================================================
+// LOGOUT
+// ================================================================
+function doOut(){
+    if(!confirm('🚪 Logout?\n\n✅ Data cloud mein safe hai!'))return;
 
-// ==========================================
-// TOAST & MODAL HANDLERS
-// ==========================================
-function toast(msg,type) {
-    const t=document.createElement('div');
-    t.className='toast '+(type==='s'?'ts':type==='e'?'te':'tw');
-    t.textContent=msg;
-    document.body.appendChild(t);
-    setTimeout(()=>t.remove(),3500);
-}
-
-document.getElementById('formModal').addEventListener('click',function(e){if(e.target===this)closeForm();});
-document.getElementById('viewModal').addEventListener('click',function(e){if(e.target===this)closeView();});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeForm();closeView();}});
-
-// ==========================================
-// START APP
-// ==========================================
-setTimeout(()=>{
-    if(firebaseConfig.apiKey === "YOUR_API_KEY") {
-        // Firebase not configured - use localStorage
-        loadOfflineData();
-        if(farmers.length===0) {
-            farmers = [
-                {code:"FR-001",name:"Ramesh Kumar",aadhar:"1234-5678-9012",mobile:"9876543210",
-                 addr:"Village Sundarpur, Lucknow, UP",bank:"SBI",ac:"32456789012",
-                 ifsc:"SBIN0001234",branch:"Main Branch",status:"Active",
-                 added:new Date().toLocaleString('en-IN'),updated:new Date().toLocaleString('en-IN')},
-                {code:"FR-002",name:"Suresh Yadav",aadhar:"2345-6789-0123",mobile:"9876543211",
-                 addr:"Village Rampur, Lucknow, UP",bank:"PNB",ac:"1234567890",
-                 ifsc:"PUNB0123400",branch:"City Branch",status:"Active",
-                 added:new Date().toLocaleString('en-IN'),updated:new Date().toLocaleString('en-IN')},
-                {code:"FR-003",name:"Meera Devi",aadhar:"3456-7890-1234",mobile:"9876543212",
-                 addr:"Village Khatoli, Meerut, UP",bank:"BOB",ac:"98765432101",
-                 ifsc:"BARB0MEERUT",branch:"Meerut Branch",status:"Pending",
-                 added:new Date().toLocaleString('en-IN'),updated:new Date().toLocaleString('en-IN')}
-            ];
-            localStorage.setItem('farmerDB_online', JSON.stringify(farmers));
-        }
-        renderTable();
-        updateSyncStatus('error');
-        hideLoading();
-        toast('⚠️ Firebase not configured. Using local storage. Setup Firebase for online sync!','w');
-    } else {
-        initFirebase();
-        setTimeout(hideLoading, 5000); // Fallback hide
+    // Save local backup before logout
+    if(CU && FD.length > 0){
+        localStorage.setItem('FD_'+CU.mobile, JSON.stringify(FD));
     }
-}, 500);
+
+    // Detach Firebase listener
+    if(farmerRef) farmerRef.off();
+
+    localStorage.removeItem('SESSION');
+    CU=null; FD=[]; FKEYS={};
+    showLogin();
+}
+
+// ================================================================
+// FORGOT PASSWORD
+// ================================================================
+async function forgotP(){
+    const mob=prompt('Registered mobile number:');
+    if(!mob||mob.length!==10){alert('❌ 10-digit mobile!');return;}
+
+    let found=false;
+
+    if(db&&isOnline){
+        const snap=await db.ref('users/'+mob).once('value');
+        if(snap.exists())found=true;
+    }
+    if(!found){
+        const lu=JSON.parse(localStorage.getItem('USERS')||'{}');
+        if(lu[mob])found=true;
+    }
+    if(!found){alert('❌ Not registered!');return;}
+
+    const np=prompt('New password (min 4):');
+    if(!np||np.length<4){alert('❌ Min 4 chars!');return;}
+
+    if(db&&isOnline) await db.ref('users/'+mob+'/password').set(btoa(np));
+    const lu=JSON.parse(localStorage.getItem('USERS')||'{}');
+    if(lu[mob]){lu[mob].password=btoa(np);localStorage.setItem('USERS',JSON.stringify(lu));}
+    alert('✅ Password reset!');
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+function swT(t){
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));
+    hMsg();
+    if(t==='login'){document.querySelectorAll('.tab')[0].classList.add('on');document.getElementById('loginF').classList.add('on');}
+    else{document.querySelectorAll('.tab')[1].classList.add('on');document.getElementById('regF').classList.add('on');}
+}
+function tP(id,el){const i=document.getElementById(id);if(i.type==='password'){i.type='text';el.textContent='🙈';}else{i.type='password';el.textContent='👁️';}}
+function sMsg(t,tp){const m=document.getElementById('aMsg');m.textContent=t;m.className='msg show msg-'+tp;setTimeout(hMsg,5000);}
+function hMsg(){const m=document.getElementById('aMsg');if(m)m.className='msg';}
+function rBtn2(b,t){b.innerHTML=t;b.classList.remove('bld');}
+function toast(m,t){const e=document.createElement('div');e.className='toast t-'+t;e.textContent=m;document.body.appendChild(e);setTimeout(()=>e.remove(),3000);}
+
+// Modal close
+document.addEventListener('click',function(e){
+    if(e.target.id==='fOv')cFm();
+    if(e.target.id==='vOv')cVm();
+});
+document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){cFm();cVm();}
+    if(e.key==='Enter'){
+        const lp=document.getElementById('loginPage');
+        if(lp&&lp.style.display!=='none'){
+            if(document.getElementById('loginF').classList.contains('on'))doLogin();
+            else doReg();
+        }
+    }
+});
+
+// ================================================================
+// 🚀 INIT - APP START
+// ================================================================
+function startApp(){
+    initFirebase();
+
+    // Check existing session
+    try{
+        const session = localStorage.getItem('SESSION');
+        if(session){
+            CU = JSON.parse(session);
+            showHome();
+            return;
+        }
+    }catch(e){}
+
+    showLogin();
+}
+
+startApp();
 </script>
 </body>
 </html>
